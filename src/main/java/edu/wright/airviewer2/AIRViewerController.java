@@ -92,6 +92,11 @@ public class AIRViewerController implements Initializable {
             File file = fileChooser.showOpenDialog(stage);
             if (null != file) {
                 String path = file.getCanonicalPath();
+                while(!path.endsWith(".pdf")) {
+                	System.out.println("select only pdf format files");
+                	file = fileChooser.showOpenDialog(stage);
+                	path = file.getCanonicalPath();
+                }
                 loadedModel = new AIRViewerModel(Paths.get(path));
             }
         } catch (IOException ex) {
