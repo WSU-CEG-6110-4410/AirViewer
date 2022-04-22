@@ -13,7 +13,8 @@
       <Pagination fx:id="pagination" prefHeight="46.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
    </center>
    <top>
-      <MenuBar BorderPane.alignment="CENTER">
+    <Pane>
+      <MenuBar BorderPane.alignment="CENTER" prefHeight="50.0" prefWidth="600.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -43,5 +44,13 @@
           </Menu>
         </menus>
       </MenuBar>
+      <HBox layoutX="50.0" layoutY="60.0" prefHeight="50.0" spacing="5" prefWidth="500.0">
+      	<TextField fx:id="textFieldValue" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" 
+AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+ 	<Button mnemonicParsing="false" onAction="#download" text="Download">
+	 </Button>
+ 	 </HBox>
+	 </Pane>
+ 	
    </top>
 </BorderPane>

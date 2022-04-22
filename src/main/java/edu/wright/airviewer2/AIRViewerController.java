@@ -6,15 +6,27 @@
 package edu.wright.airviewer2;
 
 import edu.wright.airviewer2.AIRViewer;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.multipdf.Splitter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import javafx.scene.control.TextField;
+import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -341,6 +353,66 @@ public class AIRViewerController implements Initializable {
             reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
         });
 
+    }
+    
+    @FXML private TextField textFieldValue;
+    
+    @SuppressWarnings("deprecation")
+   @FXML private void download() throws IOException {
+    System.out.println("textfieldvalue"+textFieldValue.getText());
+    Splitter splitter = new Splitter();
+   // FileChooser fileChooser = new FileChooser();
+   // FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
+   // fileChooser.getExtensionFilters().add(extFilter);
+   // 
+   // File file = fileChooser.showSaveDialog((Stage) pagination.getScene().getWindow());
+    DirectoryChooser dirChooser = new DirectoryChooser();
+    dirChooser.setTitle("Select a folder");
+    File selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
+    String selectedDirPath =selectedDir.getAbsolutePath();
+    SimpleDateFormat sf = new SimpleDateFormat("ddmmyyyHHMMSS");
+    
+    PDFMergerUtility PDFmerger = new PDFMergerUtility();
+    PDDocument document = PDDocument.load(new File(model.getPathName()));
+    List<PDDocument> pages = splitter.split(document);
+    Iterator<PDDocument> iterator = pages.listIterator();
+    //Saving each page as an individual document
+    
+    
+    PDDocument document1 = new PDDocument();
+    OutputStream out = new ByteArrayOutputStream();
+    boolean flag = false;
+    String[] values = textFieldValue.getText().split(",");
+    System.out.println("valueslength"+values.length);
+    int count =1;
+    for(int i=0;i<values.length;i++) {
+    System.out.println("i..."+values[i]);
+    for(int j=0;j<pages.size();j++) {
+    System.out.println("j..."+j);
+    if(values[i].equals((j+1)+"")) {
+    System.out.println("values.........."+values[i]);
+    
+    File tempfile = new File(selectedDirPath + "/" + "temp_"+values[i]+".pdf");
+    flag = true; 
+    PDDocument pd = pages.get(j);
+    pd.save(tempfile);
+    PDFmerger.addSource(tempfile);
+    
+    
+    }
+    }
+    }
+    if(flag) {
+    String name = "split"+sf.format(new Date()) +".pdf";
+    String path = selectedDirPath + "/" + name;
+    PDFmerger.setDestinationFileName(path);
+    PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+    }
+    for(int i=0;i<values.length;i++) {
+    File tempfile = new File(selectedDirPath + "/" + "temp_"+values[i]+".pdf");
+    tempfile.delete();
+    }
+    
     }
 
 }
