@@ -265,9 +265,7 @@ public class AIRViewerController implements Initializable {
         if (null != model) {
             Stage stage = AIRViewer.getPrimaryStage();
             assert null != stage;
-
             model.deselectAll();
-
             pagination.setPageCount(model.numPages());
             pagination.setPageFactory(index -> {
                 if (null == pageImageGroup) {
@@ -339,7 +337,6 @@ public class AIRViewerController implements Initializable {
         }
 
         refreshUserInterface();
-
         return model;
     }
 
@@ -352,62 +349,58 @@ public class AIRViewerController implements Initializable {
         stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
             reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
         });
-
     }
     
     @FXML private TextField textFieldValue;
     
-    @SuppressWarnings("deprecation")
-   @FXML private void download() throws IOException {
-    System.out.println("textfieldvalue"+textFieldValue.getText());
-    Splitter splitter = new Splitter();
-    DirectoryChooser dirChooser = new DirectoryChooser();
-    dirChooser.setTitle("Select a folder");
-    File selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
-    String selectedDirPath =selectedDir.getAbsolutePath();
-    SimpleDateFormat sf = new SimpleDateFormat("ddmmyyyHHMMSS");
-    
-    PDFMergerUtility PDFmerger = new PDFMergerUtility();
-    PDDocument document = PDDocument.load(new File(model.getPathName()));
-    List<PDDocument> pages = splitter.split(document);
-    Iterator<PDDocument> iterator = pages.listIterator();
-    //Saving each page as an individual document
-    
-    
-    PDDocument document1 = new PDDocument();
-    OutputStream out = new ByteArrayOutputStream();
-    boolean flag = false;
-    String[] values = textFieldValue.getText().split(",");
-    System.out.println("valueslength"+values.length);
-    int count =1;
-    for(int i=0;i<values.length;i++) {
-    System.out.println("i..."+values[i]);
-    for(int j=0;j<pages.size();j++) {
-    System.out.println("j..."+j);
-    if(values[i].equals((j+1)+"")) {
-    System.out.println("values.........."+values[i]);
-    
-    File tempfile = new File(selectedDirPath + "/" + "temp_"+values[i]+".pdf");
-    flag = true; 
-    PDDocument pd = pages.get(j);
-    pd.save(tempfile);
-    PDFmerger.addSource(tempfile);
-    
-    
-    }
-    }
-    }
-    if(flag) {
-    String name = "split"+sf.format(new Date()) +".pdf";
-    String path = selectedDirPath + "/" + name;
-    PDFmerger.setDestinationFileName(path);
-    PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-    }
-    for(int i=0;i<values.length;i++) {
-    File tempfile = new File(selectedDirPath + "/" + "temp_"+values[i]+".pdf");
-    tempfile.delete();
-    }
-    
-    }
+	@SuppressWarnings("deprecation")
+	@FXML
+	private void download() throws IOException {
+		System.out.println("textfieldvalue" + textFieldValue.getText());
+		Splitter splitter = new Splitter();
+		DirectoryChooser dirChooser = new DirectoryChooser();
+		dirChooser.setTitle("Select a folder");
+		File selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
+		String selectedDirPath = selectedDir.getAbsolutePath();
+		SimpleDateFormat sf = new SimpleDateFormat("ddmmyyyHHMMSS");
+
+		PDFMergerUtility PDFmerger = new PDFMergerUtility();
+		PDDocument document = PDDocument.load(new File(model.getPathName()));
+		List<PDDocument> pages = splitter.split(document);
+		Iterator<PDDocument> iterator = pages.listIterator();
+
+		// Saving each page as an individual document
+		PDDocument document1 = new PDDocument();
+		OutputStream out = new ByteArrayOutputStream();
+		boolean flag = false;
+		String[] values = textFieldValue.getText().split(",");
+		System.out.println("valueslength" + values.length);
+		int count = 1;
+		for (int i = 0; i < values.length; i++) {
+			System.out.println("i..." + values[i]);
+			for (int j = 0; j < pages.size(); j++) {
+				System.out.println("j..." + j);
+				if (values[i].equals((j + 1) + "")) {
+					System.out.println("values.........." + values[i]);
+
+					File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
+					flag = true;
+					PDDocument pd = pages.get(j);
+					pd.save(tempfile);
+					PDFmerger.addSource(tempfile);
+				}
+			}
+		}
+		if (flag) {
+			String name = "split" + sf.format(new Date()) + ".pdf";
+			String path = selectedDirPath + "/" + name;
+			PDFmerger.setDestinationFileName(path);
+			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+		}
+		for (int i = 0; i < values.length; i++) {
+			File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
+			tempfile.delete();
+		}
+	}
 
 }

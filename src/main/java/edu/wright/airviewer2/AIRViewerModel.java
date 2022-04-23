@@ -24,11 +24,8 @@ import org.apache.pdfbox.rendering.PDFRenderer;
  */
 public class AIRViewerModel extends DocumentCommandWrapper {
 
-    //private static final Logger logger = Logger.getLogger(AIRViewerModel.class.getName());
-
     private PDFRenderer renderer;
     private String filePath;
-
 
     AIRViewerModel(Path path) throws IOException {
         super(PDDocument.load(path.toFile()), "");
@@ -44,7 +41,6 @@ public class AIRViewerModel extends DocumentCommandWrapper {
     Image getImage(int pageNumber) {
         BufferedImage pageImage;
         try {
-        	System.out.println("value count"+pageNumber);
             pageImage = renderer.renderImage(pageNumber);
         } catch (IOException ex) {
             throw new UncheckedIOException("AIRViewer throws IOException", ex);
