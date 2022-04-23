@@ -24,12 +24,13 @@ import org.apache.pdfbox.rendering.PDFRenderer;
  */
 public class AIRViewerModel extends DocumentCommandWrapper {
 
-    //private static final Logger logger = Logger.getLogger(AIRViewerModel.class.getName());
-
     private PDFRenderer renderer;
+    private String filePath;
 
     AIRViewerModel(Path path) throws IOException {
         super(PDDocument.load(path.toFile()), "");
+        filePath = path.normalize().toString()+"";
+        System.out.println(filePath);
         renderer = new PDFRenderer(wrappedDocument);
     }
 
@@ -54,5 +55,8 @@ public class AIRViewerModel extends DocumentCommandWrapper {
 //            Logger.getLogger(AIRViewerModel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public String getPathName() {
+    	 return filePath;
+    	 }
 
 }
