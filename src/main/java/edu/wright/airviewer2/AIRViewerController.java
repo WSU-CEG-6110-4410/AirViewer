@@ -361,11 +361,6 @@ public class AIRViewerController implements Initializable {
    @FXML private void download() throws IOException {
     System.out.println("textfieldvalue"+textFieldValue.getText());
     Splitter splitter = new Splitter();
-   // FileChooser fileChooser = new FileChooser();
-   // FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
-   // fileChooser.getExtensionFilters().add(extFilter);
-   // 
-   // File file = fileChooser.showSaveDialog((Stage) pagination.getScene().getWindow());
     DirectoryChooser dirChooser = new DirectoryChooser();
     dirChooser.setTitle("Select a folder");
     File selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
