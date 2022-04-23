@@ -32,7 +32,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 import java.awt.image.BufferedImage;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
@@ -304,7 +303,7 @@ public class AIRViewerController implements Initializable {
                     MessageBox.show("Saved pdf at " + path, "Saved!");
                 } catch (Exception e) {
                     System.out.println(e);
-                    MessageBox.show(e.toString(), "IO Exception");
+                    MessageBox.show(e.toString(), "Failed to save pdf file. Please try again later");
                 }
             });
             saveAsMenuItem.setOnAction((ActionEvent event) -> {
