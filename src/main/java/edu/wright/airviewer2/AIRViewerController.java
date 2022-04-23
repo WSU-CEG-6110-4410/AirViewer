@@ -25,6 +25,15 @@ import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.tools.imageio.ImageIOUtil;
+import java.awt.image.BufferedImage;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
@@ -37,6 +46,9 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -59,6 +71,9 @@ public class AIRViewerController implements Initializable {
 
     @FXML
     private MenuItem openMenuItem;
+    
+    @FXML
+    private MenuItem saveMenuItem; // Saves the open PDF File
 
     @FXML
     private MenuItem saveAsMenuItem;
@@ -92,6 +107,8 @@ public class AIRViewerController implements Initializable {
     private ImageView currentPageImageView;
 
     private Group pageImageGroup;
+    
+    private String path;
 
     private AIRViewerModel promptLoadModel(String startPath) {
 
@@ -103,7 +120,7 @@ public class AIRViewerController implements Initializable {
             Stage stage = (Stage) pagination.getScene().getWindow();
             File file = fileChooser.showOpenDialog(stage);
             if (null != file) {
-                String path = file.getCanonicalPath();
+                path = file.getCanonicalPath();
                 while(!path.endsWith(".pdf")) {
                 	System.out.println("select only pdf format files");
                 	file = fileChooser.showOpenDialog(stage);
@@ -172,6 +189,7 @@ public class AIRViewerController implements Initializable {
         if (null != model) {
             pagination.setPageCount(model.numPages());
             pagination.setDisable(false);
+            saveMenuItem.setDisable(false);
             saveAsMenuItem.setDisable(false);
             extractTextMenuItem.setDisable(false);
             undoMenuItem.setDisable(!model.getCanUndo());
@@ -223,6 +241,7 @@ public class AIRViewerController implements Initializable {
                 return pageImageGroup;
             });
             pagination.setDisable(true);
+            saveMenuItem.setDisable(true);
             saveAsMenuItem.setDisable(true);
             extractTextMenuItem.setDisable(true);
             undoMenuItem.setDisable(true);
@@ -277,6 +296,16 @@ public class AIRViewerController implements Initializable {
                 model.deselectAll();
                 refreshUserInterface();
                 return pageImageGroup;
+            });
+
+            saveMenuItem.setOnAction((ActionEvent event) -> {
+                try {
+                    model.save(new File(path));
+                    MessageBox.show("Saved pdf at " + path, "Saved!");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    MessageBox.show(e.toString(), "IO Exception");
+                }
             });
             saveAsMenuItem.setOnAction((ActionEvent event) -> {
                 FileChooser fileChooser = new FileChooser();

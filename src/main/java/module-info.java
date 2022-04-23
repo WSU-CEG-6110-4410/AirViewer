@@ -7,4 +7,5 @@ module edu.wright.airviewer2 {
     requires javafx.graphicsEmpty;
     requires javafx.swing;
     requires pdfbox;
+    requires pdfbox.tools;
 }
