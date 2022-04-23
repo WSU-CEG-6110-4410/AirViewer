@@ -24,7 +24,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 /**
  *
  * @author erik
- */
+ */ 
 public class AIRViewerModel extends DocumentCommandWrapper {
 
     //private static final Logger logger = Logger.getLogger(AIRViewerModel.class.getName());
