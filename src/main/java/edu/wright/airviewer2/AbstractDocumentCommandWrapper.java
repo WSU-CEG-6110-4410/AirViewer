@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -50,7 +51,7 @@ public abstract class AbstractDocumentCommandWrapper {
      *
      */
     protected final PDDocument wrappedDocument;
-
+    
     /**
      *
      */
@@ -165,6 +166,7 @@ public abstract class AbstractDocumentCommandWrapper {
      */
     protected static void registerCommandClassWithName(makeCommand command, String aName) {
         nameToFactoryMap.put(aName, command);
+        
     }
 
     /**

@@ -13,9 +13,12 @@ import java.io.UncheckedIOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.file.Path;
+import java.util.Calendar;
+
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 /**
@@ -27,15 +30,45 @@ public class AIRViewerModel extends DocumentCommandWrapper {
     //private static final Logger logger = Logger.getLogger(AIRViewerModel.class.getName());
 
     private PDFRenderer renderer;
+    
+    private PDDocumentInformation docInfo; 
 
     AIRViewerModel(Path path) throws IOException {
         super(PDDocument.load(path.toFile()), "");
         renderer = new PDFRenderer(wrappedDocument);
+        
     }
 
     int numPages() {
         return wrappedDocument.getPages().getCount();
     }
+    
+    /*Getting the Title of the docuemnt from "getDocumentInformation"*/
+    String title() {
+		return wrappedDocument.getDocumentInformation().getTitle();
+    	
+    }
+    /*Getting the Creation Date of the docuemnt from "getDocumentInformation"*/
+    Calendar creationDate() {
+		return wrappedDocument.getDocumentInformation().getCreationDate();
+    	
+    }
+    /*Getting the Modified Date of the docuemnt from "getDocumentInformation"*/
+    Calendar modifiedDate() {
+		return wrappedDocument.getDocumentInformation().getModificationDate();
+    	
+    }
+    /*Getting the Author of the docuemnt from "getDocumentInformation"*/
+    String Author() {
+		return wrappedDocument.getDocumentInformation().getAuthor();
+    	
+    }
+    /*Getting the Subject of the docuemnt from "getDocumentInformation"*/
+    String Subject() {
+		return wrappedDocument.getDocumentInformation().getSubject();
+    	
+    }
+    
 
     Image getImage(int pageNumber) {
         BufferedImage pageImage;
@@ -50,6 +83,7 @@ public class AIRViewerModel extends DocumentCommandWrapper {
     public void save(File file) {
         try {
             wrappedDocument.save(file);
+            
         } catch (IOException ex) {
 //            Logger.getLogger(AIRViewerModel.class.getName()).log(Level.SEVERE, null, ex);
         }

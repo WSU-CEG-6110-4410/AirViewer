@@ -12,9 +12,15 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.swing.JOptionPane;
+import javax.xml.transform.Source;
+
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -33,7 +39,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.TextPosition;
 /**
  *
  * @author erik
@@ -48,6 +55,9 @@ public class AIRViewerController implements Initializable {
     @FXML
     private MenuItem openMenuItem;
 
+    @FXML
+    private PDDocumentInformation docInfo;
+    
     @FXML
     private MenuItem saveAsMenuItem;
 
@@ -98,6 +108,7 @@ public class AIRViewerController implements Initializable {
                 	path = file.getCanonicalPath();
                 }
                 loadedModel = new AIRViewerModel(Paths.get(path));
+               
             }
         } catch (IOException ex) {
 //            Logger.getLogger(AIRViewerController.class.getName()).log(
@@ -110,11 +121,13 @@ public class AIRViewerController implements Initializable {
         return loadedModel;
     }
 
+   
+    
     private void synchronizeSelectionKnobs() {
         if (null != model && null != currentPageImageView && null != pageImageGroup) {
             List<java.awt.Rectangle> selectedAreas = model.getSelectedAreas();
             ArrayList<Node> victims = new ArrayList<>(pageImageGroup.getChildren());
-            
+          
             // Delete everything in teh group that isn't currentPageImageView
             victims.stream().filter((n) -> (n != currentPageImageView)).forEach((n) -> {
                 pageImageGroup.getChildren().remove(n);
@@ -170,20 +183,24 @@ public class AIRViewerController implements Initializable {
             addEllipseAnnotationMenuItem.setDisable(false);
             addTextAnnotationMenuItem.setDisable(false);
             deleteAnnotationMenuItem.setDisable(0 >= model.getSelectionSize());
-
+            
+           
+           
             if (null != currentPageImageView) {
                 int pageIndex = pagination.getCurrentPageIndex();
                 currentPageImageView.setImage(model.getImage(pageIndex));
+                
                 currentPageImageView.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent me) {
                         float flippedY = (float) currentPageImageView.getBoundsInParent().getHeight() - (float) me.getY();
                         System.out.println("Mouse pressed X: " + me.getX()
-                                + " Y: " + Float.toString(flippedY));
-
+                                + " Y: " + Float.toString(flippedY) );
+                        
+                        
                         float xInPage = (float) me.getX();
                         float yInPage = flippedY;
-
+                       
                         if (null != model) {
                             int pageIndex = pagination.getCurrentPageIndex();
                             if (!me.isMetaDown() && !me.isShiftDown()) {
@@ -253,7 +270,13 @@ public class AIRViewerController implements Initializable {
         if (null != model) {
             Stage stage = AIRViewer.getPrimaryStage();
             assert null != stage;
-
+            /* Printing the title of the PDF document opened */
+            JOptionPane.showMessageDialog(null, "Title: "+model.title()+ System.lineSeparator() +"Creation Date:"+ model.creationDate().getTime());
+            System.out.println("Title: "+model.title());
+            System.out.println("Creation Date:"+ model.creationDate().getTime());
+            System.out.println("Modified Date:"+ model.modifiedDate().getTime());
+            System.out.println("Author:"+ model.Author());
+            System.out.println("Subject:"+ model.Subject());
             model.deselectAll();
 
             pagination.setPageCount(model.numPages());
