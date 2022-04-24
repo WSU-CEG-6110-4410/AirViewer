@@ -6,21 +6,33 @@
 package edu.wright.airviewer2;
 
 import edu.wright.airviewer2.AIRViewer;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import javax.swing.JOptionPane; 
-import javax.xml.transform.Source;
-
-import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.multipdf.Splitter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import java.awt.image.BufferedImage;
+import javafx.scene.control.TextField;
+import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -31,6 +43,9 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -54,6 +69,9 @@ public class AIRViewerController implements Initializable {
 
     @FXML
     private MenuItem openMenuItem;
+    
+    @FXML
+    private MenuItem saveMenuItem; // Saves the open PDF File
 
     @FXML
     private PDDocumentInformation docInfo;
@@ -90,6 +108,8 @@ public class AIRViewerController implements Initializable {
     private ImageView currentPageImageView;
 
     private Group pageImageGroup;
+    
+    private String path;
 
     private AIRViewerModel promptLoadModel(String startPath) {
 
@@ -101,7 +121,7 @@ public class AIRViewerController implements Initializable {
             Stage stage = (Stage) pagination.getScene().getWindow();
             File file = fileChooser.showOpenDialog(stage);
             if (null != file) {
-                String path = file.getCanonicalPath();
+                path = file.getCanonicalPath();
                 while(!path.endsWith(".pdf")) {
                 	System.out.println("select only pdf format files");
                 	file = fileChooser.showOpenDialog(stage);
@@ -173,6 +193,7 @@ public class AIRViewerController implements Initializable {
         if (null != model) {
             pagination.setPageCount(model.numPages());
             pagination.setDisable(false);
+            saveMenuItem.setDisable(false);
             saveAsMenuItem.setDisable(false);
             extractTextMenuItem.setDisable(false);
             undoMenuItem.setDisable(!model.getCanUndo());
@@ -228,6 +249,7 @@ public class AIRViewerController implements Initializable {
                 return pageImageGroup;
             });
             pagination.setDisable(true);
+            saveMenuItem.setDisable(true);
             saveAsMenuItem.setDisable(true);
             extractTextMenuItem.setDisable(true);
             undoMenuItem.setDisable(true);
@@ -270,15 +292,7 @@ public class AIRViewerController implements Initializable {
         if (null != model) {
             Stage stage = AIRViewer.getPrimaryStage();
             assert null != stage;
-            /* Printing the title of the PDF document opened */
-            JOptionPane.showMessageDialog(null, "Title: "+model.title()+ System.lineSeparator() +"Creation Date:"+ model.creationDate().getTime());
-            System.out.println("Title: "+model.title());
-            System.out.println("Creation Date:"+ model.creationDate().getTime());
-            System.out.println("Modified Date:"+ model.modifiedDate().getTime());
-            System.out.println("Author:"+ model.Author());
-            System.out.println("Subject:"+ model.Subject());
             model.deselectAll();
-
             pagination.setPageCount(model.numPages());
             pagination.setPageFactory(index -> {
                 if (null == pageImageGroup) {
@@ -290,6 +304,16 @@ public class AIRViewerController implements Initializable {
                 model.deselectAll();
                 refreshUserInterface();
                 return pageImageGroup;
+            });
+
+            saveMenuItem.setOnAction((ActionEvent event) -> {
+                try {
+                    model.save(new File(path));
+                    MessageBox.show("Saved pdf at " + path, "Saved!");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    MessageBox.show(e.toString(), "Failed to save pdf file. Please try again later");
+                }
             });
             saveAsMenuItem.setOnAction((ActionEvent event) -> {
                 FileChooser fileChooser = new FileChooser();
@@ -350,7 +374,6 @@ public class AIRViewerController implements Initializable {
         }
 
         refreshUserInterface();
-
         return model;
     }
 
@@ -363,7 +386,58 @@ public class AIRViewerController implements Initializable {
         stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
             reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
         });
-
     }
+    
+    @FXML private TextField textFieldValue;
+    
+	@SuppressWarnings("deprecation")
+	@FXML
+	private void download() throws IOException {
+		System.out.println("textfieldvalue" + textFieldValue.getText());
+		Splitter splitter = new Splitter();
+		DirectoryChooser dirChooser = new DirectoryChooser();
+		dirChooser.setTitle("Select a folder");
+		File selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
+		String selectedDirPath = selectedDir.getAbsolutePath();
+		SimpleDateFormat sf = new SimpleDateFormat("ddmmyyyHHMMSS");
+
+		PDFMergerUtility PDFmerger = new PDFMergerUtility();
+		PDDocument document = PDDocument.load(new File(model.getPathName()));
+		List<PDDocument> pages = splitter.split(document);
+		Iterator<PDDocument> iterator = pages.listIterator();
+
+		// Saving each page as an individual document
+		PDDocument document1 = new PDDocument();
+		OutputStream out = new ByteArrayOutputStream();
+		boolean flag = false;
+		String[] values = textFieldValue.getText().split(",");
+		System.out.println("valueslength" + values.length);
+		int count = 1;
+		for (int i = 0; i < values.length; i++) {
+			System.out.println("i..." + values[i]);
+			for (int j = 0; j < pages.size(); j++) {
+				System.out.println("j..." + j);
+				if (values[i].equals((j + 1) + "")) {
+					System.out.println("values.........." + values[i]);
+
+					File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
+					flag = true;
+					PDDocument pd = pages.get(j);
+					pd.save(tempfile);
+					PDFmerger.addSource(tempfile);
+				}
+			}
+		}
+		if (flag) {
+			String name = "split" + sf.format(new Date()) + ".pdf";
+			String path = selectedDirPath + "/" + name;
+			PDFmerger.setDestinationFileName(path);
+			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+		}
+		for (int i = 0; i < values.length; i++) {
+			File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
+			tempfile.delete();
+		}
+	}
 
 }
