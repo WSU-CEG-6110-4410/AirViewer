@@ -25,6 +25,7 @@ import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -56,6 +57,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.TextPosition;
+import javax.swing.JOptionPane; 
 /**
  *
  * @author erik
@@ -191,7 +193,7 @@ public class AIRViewerController implements Initializable {
         assert deleteAnnotationMenuItem != null : "fx:id=\"deleteAnnotationMenuItem\" was not injected: check your FXML file 'simple.fxml'.";
 
         if (null != model) {
-            pagination.setPageCount(model.numPages());
+        	pagination.setPageCount(model.numPages());
             pagination.setDisable(false);
             saveMenuItem.setDisable(false);
             saveAsMenuItem.setDisable(false);
@@ -290,6 +292,8 @@ public class AIRViewerController implements Initializable {
         closeMenuItem.setDisable(false);
 
         if (null != model) {
+        	JOptionPane.showMessageDialog(null, "Title: "+model.title()+ System.lineSeparator() +"Creation Date:"+ model.creationDate().getTime()+"\n"+"Author: "+model.Author()+ System.lineSeparator()
+        	+"Modified Date: "+model.modifiedDate().getTime()+ System.lineSeparator()+"Subject: "+model.Subject()+ System.lineSeparator());
             Stage stage = AIRViewer.getPrimaryStage();
             assert null != stage;
             model.deselectAll();
