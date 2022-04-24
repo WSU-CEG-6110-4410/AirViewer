@@ -123,6 +123,7 @@ public class AIRViewerController implements Initializable {
 			fileChooser.setInitialFileName(startPath);
 			Stage stage = (Stage) pagination.getScene().getWindow();
 			File file = fileChooser.showOpenDialog(stage);
+			// modified the code to open only files with .pdf extension
 			if (null != file) {
 				path = file.getCanonicalPath();
 				while (!path.endsWith(".pdf")) {
