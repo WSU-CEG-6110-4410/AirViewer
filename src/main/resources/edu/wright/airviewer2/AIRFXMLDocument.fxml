@@ -46,6 +46,12 @@
         </menus>
       </MenuBar>
       <HBox layoutX="50.0" layoutY="60.0" prefHeight="50.0" spacing="5" prefWidth="500.0">
+      	<Button mnemonicParsing="false" onAction="#zoomIn" text="+">
+ 
+           </Button>
+           <Button mnemonicParsing="false" onAction="#zoomOut" text="-">
+ 
+           </Button>
       	<TextField fx:id="textFieldValue" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" 
 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
  	<Button mnemonicParsing="false" onAction="#download" text="Download">
@@ -54,4 +60,17 @@ AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0
 	 </Pane>
  	
    </top>
+<!--   <bottom>
+      <HBox prefHeight="50.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+        <children>
+           <Button mnemonicParsing="false" onAction="#zoomIn" text="+">
+ 
+           </Button>
+           <Button mnemonicParsing="false" onAction="#zoomOut" text="-">
+ 
+           </Button>
+ 
+          </children>
+         </HBox>
+     </bottom>  -->
 </BorderPane>
