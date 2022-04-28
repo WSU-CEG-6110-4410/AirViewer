@@ -54,7 +54,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.util.Calendar;
 import javafx.stage.WindowEvent;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.TextPosition;
 import javax.swing.JOptionPane;
@@ -105,6 +107,9 @@ public class AIRViewerController implements Initializable {
 
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
+	
+	@FXML
+	private MenuItem signMenuItem; // Allows the user to sign a document
 
 	private AIRViewerModel model;
 
@@ -392,6 +397,40 @@ public class AIRViewerController implements Initializable {
 		refreshUserInterface();
 		return model;
 	}
+	//Initializing Sign menu item
+	private void initSignMenu() {
+
+        signMenuItem.setOnAction(e -> signDocument());
+    }
+	
+	private void signDocument() {
+        // Create a Page object
+        PDPage pdPage = new PDPage();
+        // Add the page to the document and save the document to a desired file.
+        model.wrappedDocument.addPage(pdPage);
+
+        try {
+
+            PDSignature pdSignature = new PDSignature();
+            pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
+            pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
+
+            pdSignature.setName("AirViewer Crew");
+            pdSignature.setLocation("WFH");
+            pdSignature.setReason("Signature Validation");
+            pdSignature.setSignDate(Calendar.getInstance());
+            model.wrappedDocument.addSignature(pdSignature, null);
+
+            model.wrappedDocument.save(path);
+            MessageBox.show("Added Signature successfully", "Alert");
+
+        } catch (IOException ioe) {
+            System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
+            MessageBox.show(ioe.toString(), "Io Exception");
+        }
+
+    }
+
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -402,6 +441,8 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
+		//Initialize menu controls
+		initSignMenu();
 	}
 
 	@FXML
