@@ -5,6 +5,7 @@
  */
 package edu.wright.airviewer2;
 
+import edu.wright.airviewer2.AIRViewerModel;
 import edu.wright.airviewer2.AIRViewer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
