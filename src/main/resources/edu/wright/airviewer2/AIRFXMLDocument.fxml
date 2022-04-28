@@ -38,6 +38,11 @@
               <MenuItem fx:id="deleteAnnotationMenuItem" mnemonicParsing="false" text="Delete Annotation" />
             </items>
           </Menu>
+          <Menu mnemonicParsing="false" text="Merge">
+            <items>
+               <MenuItem fx:id="mergeFileMenuItem" mnemonicParsing="false" text="Merge File" />
+            </items>
+          </Menu>         
           <Menu mnemonicParsing="false" text="Help">
             <items>
               <MenuItem mnemonicParsing="false" text="About" />
