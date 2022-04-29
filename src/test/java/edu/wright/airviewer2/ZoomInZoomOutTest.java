@@ -25,7 +25,6 @@ public class ZoomInZoomOutTest {
 	@Test
 	public void testZoomIn() {
 		DoubleProperty doubleProperty = new SimpleDoubleProperty(3);
-		//doubleProperty.bind(slider.valueProperty());
 		new ZoomInZoomOut().zoomIn(doubleProperty) ;
 	}
 	
@@ -37,7 +36,6 @@ public class ZoomInZoomOutTest {
 	@Test
 	public void testZoomOut() {
 		DoubleProperty doubleProperty = new SimpleDoubleProperty(7);
-		//doubleProperty.bind(slider.valueProperty());
 	    new ZoomInZoomOut().zoomOut(doubleProperty) ;
 		
 	}
