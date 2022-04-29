@@ -109,14 +109,16 @@ public class AIRViewerController implements Initializable {
 
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
+	
+	@FXML
+	private MenuItem signMenuItem; // Allows the user to sign a document
 
 	@FXML
 	Button removePageButton; // Remove the current page in the Document
-	private MenuItem signMenuItem; // Allows the user to sign a document
+	
 
-	// Opens a modal to display information about the app
 	@FXML
-	private MenuItem aboutMenuItem;
+	private MenuItem aboutMenuItem; // Opens a modal to display information about the app
 
 	private AIRViewerModel model;
 
@@ -492,6 +494,8 @@ public class AIRViewerController implements Initializable {
 
 		// Initialize about menu control
 		aboutMenu();
+		// Initialize sign menu
+		initSignMenu();
 	}
 
 	@FXML

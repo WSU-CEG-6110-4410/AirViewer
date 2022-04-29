@@ -42,6 +42,7 @@
             <items>
 
               	  <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About" />
+              	  <MenuItem fx:id="signMenuItem" mnemonicParsing="false" text="Sign Document" />
             </items>
           </Menu>
         </menus>
