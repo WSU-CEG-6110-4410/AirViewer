@@ -327,9 +327,9 @@ public class AIRViewerController implements Initializable {
 				pageImageGroup.getChildren().clear();
 				pageImageGroup.getChildren().add(currentPageImageView);
 				System.out.println("page" + index);
-				System.out.println("numberofpages" + model.numPages());
+				System.out.println("numberofpages : " + model.numPages());
 				double percentage = new ProgressBarAndIndicator().getPercentage(index, model);
-				System.out.println("percentage" + percentage);
+				System.out.println("percentage : " + percentage);
 				progressBar.setProgress(percentage);
 				progressIndicator.setProgress(percentage);
 				model.deselectAll();
