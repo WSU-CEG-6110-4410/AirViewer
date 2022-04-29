@@ -109,10 +109,9 @@ public class AIRViewerController implements Initializable {
 
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
-	
 
-    @FXML
-    Button removePageButton; // Remove the current page in the Document
+	@FXML
+	Button removePageButton; // Remove the current page in the Document
 	private MenuItem signMenuItem; // Allows the user to sign a document
 
 	// Opens a modal to display information about the app
@@ -122,7 +121,7 @@ public class AIRViewerController implements Initializable {
 	private AIRViewerModel model;
 
 	private ImageView currentPageImageView;
-	
+
 	@FXML
 	VBox rightControls; // Controls on the Rights side of the Scene
 
@@ -419,56 +418,55 @@ public class AIRViewerController implements Initializable {
 		refreshUserInterface();
 		return model;
 	}
-	
-	 /**
-     * Initializes the page control for the creation and deletion of
-     */
 
-    private void initPageControls() {
-        removePageButton.setOnAction((ActionEvent e) -> {
-            int pageIndex = pagination.getCurrentPageIndex();
-            PDPage page = model.wrappedDocument.getPage(pageIndex);
-            model.wrappedDocument.removePage(page);
-            refreshUserInterface();
-            pagination.setCurrentPageIndex(pageIndex == 0 ? 0 : pageIndex - 1);
-        });
+	/**
+	 * Initializes the page control for the creation and deletion of
+	 */
 
-    }
+	private void initPageControls() {
+		removePageButton.setOnAction((ActionEvent e) -> {
+			int pageIndex = pagination.getCurrentPageIndex();
+			PDPage page = model.wrappedDocument.getPage(pageIndex);
+			model.wrappedDocument.removePage(page);
+			refreshUserInterface();
+			pagination.setCurrentPageIndex(pageIndex == 0 ? 0 : pageIndex - 1);
+		});
 
-	//Initializing Sign menu item
+	}
+
+	// Initializing Sign menu item
 	private void initSignMenu() {
 
-        signMenuItem.setOnAction(e -> signDocument());
-    }
-	
+		signMenuItem.setOnAction(e -> signDocument());
+	}
+
 	private void signDocument() {
-        // Create a Page object
-        PDPage pdPage = new PDPage();
-        // Add the page to the document and save the document to a desired file.
-        model.wrappedDocument.addPage(pdPage);
+		// Create a Page object
+		PDPage pdPage = new PDPage();
+		// Add the page to the document and save the document to a desired file.
+		model.wrappedDocument.addPage(pdPage);
 
-        try {
+		try {
 
-            PDSignature pdSignature = new PDSignature();
-            pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
-            pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
+			PDSignature pdSignature = new PDSignature();
+			pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
+			pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
 
-            pdSignature.setName("AirViewer Crew");
-            pdSignature.setLocation("WFH");
-            pdSignature.setReason("Signature Validation");
-            pdSignature.setSignDate(Calendar.getInstance());
-            model.wrappedDocument.addSignature(pdSignature, null);
+			pdSignature.setName("AirViewer Crew");
+			pdSignature.setLocation("WFH");
+			pdSignature.setReason("Signature Validation");
+			pdSignature.setSignDate(Calendar.getInstance());
+			model.wrappedDocument.addSignature(pdSignature, null);
 
-            model.wrappedDocument.save(path);
-            MessageBox.show("Added Signature successfully", "Alert");
+			model.wrappedDocument.save(path);
+			MessageBox.show("Added Signature successfully", "Alert");
 
-        } catch (IOException ioe) {
-            System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
-            MessageBox.show("Error while saving pdf. Please try again later"," Sorry for Causing incovinience!");
-        }
+		} catch (IOException ioe) {
+			System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
+			MessageBox.show("Error while saving pdf. Please try again later", " Sorry for Causing incovinience!");
+		}
 
-    }
-
+	}
 
 	/*
 	 * Initializes about menu function
