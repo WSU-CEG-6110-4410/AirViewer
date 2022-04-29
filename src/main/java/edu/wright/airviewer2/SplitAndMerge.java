@@ -18,6 +18,9 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import com.google.java.contract.Ensures;
 import com.google.java.contract.Requires;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 
 import javafx.scene.control.Pagination;
 import javafx.stage.DirectoryChooser;
@@ -93,8 +96,16 @@ public class SplitAndMerge  {
           String name = "merge-"+sf.format(new Date()) +".pdf";
           String path = selectedDirPath + "/" + name;
    		   PDFmerger.setDestinationFileName(path);
-       	   PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-          
+   		   PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+   		   /**
+			* [Issue41] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/41)
+		    * Alert pops up when the merge is done successfully
+			*/
+   		   Alert alert = new Alert(AlertType.INFORMATION);
+   		   alert.setTitle("Success");
+   		   alert.setHeaderText("Results:");
+   		   alert.setContentText("Files has been merged with name " + name);
+   		   alert.showAndWait();
           
        }
     
@@ -190,6 +201,15 @@ public class SplitAndMerge  {
 		    	   String path = selectedDirPath + "/" + name;
 				   PDFmerger.setDestinationFileName(path);
 				   PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+				   /**
+					* [Issue41] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/41)
+				    * Alert pops up when the split is done successfully
+					*/
+				   Alert alert = new Alert(AlertType.INFORMATION);
+				   alert.setTitle("Success");
+				   alert.setHeaderText("Results:");
+				   alert.setContentText("File has been split with name "+name);	
+				   alert.showAndWait();
 		       }
 		       for(int i=0;i<values.length;i++) {
 		    	   File tempfile = new File(selectedDirPath + "/" + "temp_"+values[i]+".pdf");
