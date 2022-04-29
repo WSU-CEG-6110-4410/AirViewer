@@ -633,14 +633,12 @@ public class AIRViewerController implements Initializable {
 
 	@FXML
 	private void zoomIn() {
-		//zoom.set(zoom.get() * 1.1);
 		new ZoomInZoomOut().zoomIn(zoom);
 
 	}
 
 	@FXML
 	private void zoomOut() {
-		//zoom.set(zoom.get() / 1.1);
 		new ZoomInZoomOut().zoomOut(zoom);
 
 	}
