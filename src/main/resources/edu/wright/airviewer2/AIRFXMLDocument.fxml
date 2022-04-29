@@ -53,9 +53,11 @@
         </menus>
       </MenuBar>
       <HBox layoutX="50.0" layoutY="60.0" prefHeight="50.0" spacing="5" prefWidth="500.0">
+      	<ProgressBar fx:id="progressBar" progress="0.0" />
+ 		<ProgressIndicator fx:id="progressIndicator" progress="0.0" />
       	<TextField fx:id="textFieldValue" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" 
-AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
- 	<Button mnemonicParsing="false" onAction="#download" text="Download">
+			AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+ 		<Button mnemonicParsing="false" onAction="#download" text="Download">
 	 </Button>
  	 </HBox>
 	 </Pane>

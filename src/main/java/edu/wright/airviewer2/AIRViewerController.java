@@ -48,6 +48,8 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -64,6 +66,7 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.TextPosition;
 import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -112,6 +115,12 @@ public class AIRViewerController implements Initializable {
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
 	
+	@FXML
+	private ProgressBar progressBar;
+	 
+	@FXML
+	private ProgressIndicator progressIndicator;
+
 	@FXML
 	private MenuItem mergeFileMenuItem;
 
@@ -352,6 +361,12 @@ public class AIRViewerController implements Initializable {
 				currentPageImageView = new ImageView(model.getImage(index));
 				pageImageGroup.getChildren().clear();
 				pageImageGroup.getChildren().add(currentPageImageView);
+				System.out.println("page" + index);
+				System.out.println("numberofpages : " + model.numPages());
+				double percentage = new ProgressBarAndIndicator().getPercentage(index, model);
+				System.out.println("percentage : " + percentage);
+				progressBar.setProgress(percentage);
+				progressIndicator.setProgress(percentage);
 				model.deselectAll();
 				refreshUserInterface();
 				return pageImageGroup;
