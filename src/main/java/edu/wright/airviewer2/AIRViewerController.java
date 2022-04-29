@@ -481,6 +481,46 @@ public class AIRViewerController implements Initializable {
 
 		aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
 	}
+	/**
+     * This method extracts an integer value from the navigate input control
+     * If the input is not an integer then the method catches a TypeError exception
+     * If the input is indeed an integer then the method sets the new page index
+     * provided it's a valid page index
+     * All errors are sent to navigationWarning control
+     */
+    private void navigateToPage() {
+        try {
+            int page = Integer.parseInt(navigateInput.getText());
+
+            if (page <= 0) {
+                navigateWarning.setText("Invalid input : less than 1");
+                return;
+            }
+
+            if (page > pagination.getPageCount()) {
+                navigateWarning.setText("Invalid input : select under " + (pagination.getPageCount() + 1));
+                return;
+            }
+
+            pagination.setCurrentPageIndex(page - 1);
+
+            navigateWarning.setText("");
+        } catch (Exception e) {
+            System.out.println(e);
+            MessageBox.show(e.toString(), "Exception");
+            navigateWarning.setVisible(true);
+            navigateWarning.setText("Invalid input");
+        }
+    }
+    
+    /**
+     * Initializes navigation methods
+     */
+
+    private void initNavigation() {
+        navigateButton.setOnAction(e -> navigateToPage());
+    }
+
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -496,6 +536,8 @@ public class AIRViewerController implements Initializable {
 		aboutMenu();
 		// Initialize sign menu
 		initSignMenu();
+		//initializing navigate button
+		initNavigation();
 	}
 
 	@FXML
