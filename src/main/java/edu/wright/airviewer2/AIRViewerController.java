@@ -425,7 +425,7 @@ public class AIRViewerController implements Initializable {
 	 * Initializes the page control for the creation and deletion of
 	 */
 
-	private void initPageControls() {
+	private void initPageRemove() {
 		removePageButton.setOnAction((ActionEvent e) -> {
 			int pageIndex = pagination.getCurrentPageIndex();
 			PDPage page = model.wrappedDocument.getPage(pageIndex);
@@ -538,6 +538,8 @@ public class AIRViewerController implements Initializable {
 		initSignMenu();
 		//initializing navigate button
 		initNavigation();
+		//initializing remove page feature
+		initPageRemove();
 	}
 
 	@FXML
