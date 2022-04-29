@@ -55,7 +55,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.util.Calendar;
 import javafx.stage.WindowEvent;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.TextPosition;
 import javax.swing.JOptionPane;
@@ -106,6 +108,13 @@ public class AIRViewerController implements Initializable {
 
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
+	
+	@FXML
+	private MenuItem signMenuItem; // Allows the user to sign a document
+
+	// Opens a modal to display information about the app
+	@FXML
+	private MenuItem aboutMenuItem;
 
 	private AIRViewerModel model;
 
@@ -407,46 +416,53 @@ public class AIRViewerController implements Initializable {
 		refreshUserInterface();
 		return model;
 	}
+
+	//Initializing Sign menu item
+	private void initSignMenu() {
+
+        signMenuItem.setOnAction(e -> signDocument());
+    }
 	
-	/**
-     * This method extracts an integer value from the navigate input control
-     * If the input is not an integer then the method catches a TypeError exception
-     * If the input is indeed an integer then the method sets the new page index
-     * provided it's a valid page index
-     * All errors are sent as output to navigationWarning control
-     */
-    private void navigateToPage() {
+	private void signDocument() {
+        // Create a Page object
+        PDPage pdPage = new PDPage();
+        // Add the page to the document and save the document to a desired file.
+        model.wrappedDocument.addPage(pdPage);
+
         try {
-            int page = Integer.parseInt(navigateInput.getText());
 
-            if (page <= 0) {
-                navigateWarning.setText("Invalid input : less than 1");
-                return;
-            }
+            PDSignature pdSignature = new PDSignature();
+            pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
+            pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
 
-            if (page > pagination.getPageCount()) {
-                navigateWarning.setText("Invalid input : select under " + (pagination.getPageCount() + 1));
-                return;
-            }
+            pdSignature.setName("AirViewer Crew");
+            pdSignature.setLocation("WFH");
+            pdSignature.setReason("Signature Validation");
+            pdSignature.setSignDate(Calendar.getInstance());
+            model.wrappedDocument.addSignature(pdSignature, null);
 
-            pagination.setCurrentPageIndex(page - 1);
+            model.wrappedDocument.save(path);
+            MessageBox.show("Added Signature successfully", "Alert");
 
-            navigateWarning.setText("");
-        } catch (Exception e) {
-            System.out.println(e);
-            MessageBox.show(e.toString(), "Exception");
-            navigateWarning.setVisible(true);
-            navigateWarning.setText("Invalid input");
+        } catch (IOException ioe) {
+            System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
+            MessageBox.show("Error while saving pdf. Please try again later"," Sorry for Causing incovinience!");
         }
-    }
-    
-    /**
-     * Initializes navigation methods
-     */
 
-    private void initNavigation() {
-        navigateButton.setOnAction(e -> navigateToPage());
     }
+
+
+	/*
+	 * Initializes about menu function
+	 */
+	private void aboutMenu() {
+
+		String msg = "This is a small JavaFX application built using Apache PDFBox, "
+				+ "maven, and NetBeans IDE to enable annotation of PDF documents "
+				+ "and text extraction with unlimited undo and redo.";
+
+		aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
+	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -457,8 +473,9 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
-		//Initializing Navigation method
-		initNavigation();
+
+		// Initialize about menu control
+		aboutMenu();
 	}
 
 	@FXML
