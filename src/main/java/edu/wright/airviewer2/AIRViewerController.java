@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
+import javafx.scene.layout.VBox;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -118,6 +119,18 @@ public class AIRViewerController implements Initializable {
 	private AIRViewerModel model;
 
 	private ImageView currentPageImageView;
+	
+	@FXML
+	VBox rightControls; // Controls on the Rights side of the Scene
+
+	@FXML
+	private TextField navigateInput; // Input a page to Navigate to
+
+	@FXML
+	private Button navigateButton; // Perform page indexed navigation actions
+
+	@FXML
+	Label navigateWarning; // Display a warning concerning invalid Navigation input
 
 	private Group pageImageGroup;
 
@@ -222,6 +235,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(false);
 			addTextAnnotationMenuItem.setDisable(false);
 			deleteAnnotationMenuItem.setDisable(0 >= model.getSelectionSize());
+			rightControls.setDisable(false);
 
 			if (null != currentPageImageView) {
 				int pageIndex = pagination.getCurrentPageIndex();
@@ -272,6 +286,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(true);
 			addTextAnnotationMenuItem.setDisable(true);
 			deleteAnnotationMenuItem.setDisable(true);
+			rightControls.setDisable(true);
 
 		}
 	}
@@ -401,6 +416,7 @@ public class AIRViewerController implements Initializable {
 		refreshUserInterface();
 		return model;
 	}
+
 	//Initializing Sign menu item
 	private void initSignMenu() {
 
@@ -457,6 +473,7 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
+
 		// Initialize about menu control
 		aboutMenu();
 	}
