@@ -30,6 +30,33 @@ public class ProgressBarAndIndicator  {
 	private Integer index;
 	private int totalPages;
 	
+	/**
+	  * [Issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/17)
+	  * [Issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/18)
+	  * [Pull request] (https://github.com/WSU-CEG-6110-4410/AirViewer/pull/40)
+	  * 
+	  * \brief     Pdf progress bar percentage method
+	  * 
+	  * \details   when user click pdf pages,using handler to pickup clicked page number 
+	  *            and pass to this method. Once get the page number,each time have to 
+	  *            increment page number with one, get the total number of pages from the 
+	  *            wrapped model.divide current page with total number of pages,
+	  *            should get double value,this value uses as parameter 
+	  *            for progress bar and progress indicator
+	  *          
+	  * \note         
+	  *          
+	  * \param[in]  index           get the pdf current page count
+	  * 
+	  * \param[in]  model           get the wrapped model with model view
+	  * 
+	  * \param[out] double          return double value this one used as percentage
+	  * 
+	  * \retval     return percentage value to controller for progress bar and progress indicator  
+	  *                     
+	  * 
+	  */
+	
 	public double getPercentage(Integer index,AIRViewerModel model) {
 		this.index= index;
 		this.totalPages = model.numPages();
