@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
+import javafx.scene.layout.VBox;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -109,6 +110,18 @@ public class AIRViewerController implements Initializable {
 	private AIRViewerModel model;
 
 	private ImageView currentPageImageView;
+	
+	@FXML
+	VBox rightControls; // Controls on the Rights side of the Scene
+
+	@FXML
+	private TextField navigateInput; // Input a page to Navigate to
+
+	@FXML
+	private Button navigateButton; // Perform page indexed navigation actions
+
+	@FXML
+	Label navigateWarning; // Display a warning concerning invalid Navigation input
 
 	private Group pageImageGroup;
 
@@ -213,6 +226,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(false);
 			addTextAnnotationMenuItem.setDisable(false);
 			deleteAnnotationMenuItem.setDisable(0 >= model.getSelectionSize());
+			rightControls.setDisable(false);
 
 			if (null != currentPageImageView) {
 				int pageIndex = pagination.getCurrentPageIndex();
@@ -263,6 +277,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(true);
 			addTextAnnotationMenuItem.setDisable(true);
 			deleteAnnotationMenuItem.setDisable(true);
+			rightControls.setDisable(true);
 
 		}
 	}
@@ -392,6 +407,46 @@ public class AIRViewerController implements Initializable {
 		refreshUserInterface();
 		return model;
 	}
+	
+	/**
+     * This method extracts an integer value from the navigate input control
+     * If the input is not an integer then the method catches a TypeError exception
+     * If the input is indeed an integer then the method sets the new page index
+     * provided it's a valid page index
+     * All errors are sent as output to navigationWarning control
+     */
+    private void navigateToPage() {
+        try {
+            int page = Integer.parseInt(navigateInput.getText());
+
+            if (page <= 0) {
+                navigateWarning.setText("Invalid input : less than 1");
+                return;
+            }
+
+            if (page > pagination.getPageCount()) {
+                navigateWarning.setText("Invalid input : select under " + (pagination.getPageCount() + 1));
+                return;
+            }
+
+            pagination.setCurrentPageIndex(page - 1);
+
+            navigateWarning.setText("");
+        } catch (Exception e) {
+            System.out.println(e);
+            MessageBox.show(e.toString(), "Exception");
+            navigateWarning.setVisible(true);
+            navigateWarning.setText("Invalid input");
+        }
+    }
+    
+    /**
+     * Initializes navigation methods
+     */
+
+    private void initNavigation() {
+        navigateButton.setOnAction(e -> navigateToPage());
+    }
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -402,6 +457,8 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
+		//Initializing Navigation method
+		initNavigation();
 	}
 
 	@FXML
