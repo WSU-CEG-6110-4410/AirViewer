@@ -426,7 +426,7 @@ public class AIRViewerController implements Initializable {
 
         } catch (IOException ioe) {
             System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
-            MessageBox.show(ioe.toString(), "Io Exception");
+            MessageBox.show("Error while saving pdf. Please try again later"," Sorry for Causing incovinience!");
         }
 
     }
