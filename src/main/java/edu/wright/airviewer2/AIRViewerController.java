@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import javafx.scene.layout.VBox;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
@@ -105,6 +106,12 @@ public class AIRViewerController implements Initializable {
 
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
+	
+	@FXML
+	VBox rightControls; // Controls on the Rights side of the Scene
+	
+    @FXML
+    Button removePageButton; // Remove the current page in the Document
 
 	private AIRViewerModel model;
 
@@ -213,6 +220,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(false);
 			addTextAnnotationMenuItem.setDisable(false);
 			deleteAnnotationMenuItem.setDisable(0 >= model.getSelectionSize());
+			rightControls.setDisable(false);
 
 			if (null != currentPageImageView) {
 				int pageIndex = pagination.getCurrentPageIndex();
@@ -263,7 +271,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(true);
 			addTextAnnotationMenuItem.setDisable(true);
 			deleteAnnotationMenuItem.setDisable(true);
-
+			rightControls.setDisable(true);
 		}
 	}
 
@@ -392,6 +400,21 @@ public class AIRViewerController implements Initializable {
 		refreshUserInterface();
 		return model;
 	}
+	
+	 /**
+     * Initializes the page control for the creation and deletion of
+     */
+
+    private void initPageControls() {
+        removePageButton.setOnAction((ActionEvent e) -> {
+            int pageIndex = pagination.getCurrentPageIndex();
+            PDPage page = model.wrappedDocument.getPage(pageIndex);
+            model.wrappedDocument.removePage(page);
+            refreshUserInterface();
+            pagination.setCurrentPageIndex(pageIndex == 0 ? 0 : pageIndex - 1);
+        });
+
+    }
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -402,6 +425,9 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
+		// initialize remove controls
+		initPageControls();
+		
 	}
 
 	@FXML
