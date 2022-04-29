@@ -40,6 +40,10 @@ import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
 import javafx.scene.layout.VBox;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -48,6 +52,8 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
@@ -151,6 +157,26 @@ public class AIRViewerController implements Initializable {
 	Label navigateWarning; // Display a warning concerning invalid Navigation input
 
 	private Group pageImageGroup;
+	
+	private PageDimensions currentPageDimensions ;
+
+	@FXML
+	private ScrollPane scrollPane = new ScrollPane();
+	private DoubleProperty zoom = new SimpleDoubleProperty(1.1);
+
+	String cssLayout = "-fx-border-color: red;\n" +
+			 "-fx-border-insets: 5;\n" +
+			 "-fx-border-width: 3;\n" +
+			 "-fx-border-style: dashed;\n";
+
+	String scrollCssLayout= "-fx-border-color: green;\n" +
+			 "-fx-border-insets: 5;\n" +
+			 "-fx-border-width: 3;\n" +
+			 "-fx-border-style: dashed;\n"+
+			 //Ne pas afficher le petit trait gris
+			 "-fx-background-color:transparent";
+	private ImageView imageView = new ImageView();
+
 
 	private String path;
 
@@ -161,7 +187,10 @@ public class AIRViewerController implements Initializable {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle("Open PDF File");
 			fileChooser.setInitialFileName(startPath);
-			Stage stage = (Stage) pagination.getScene().getWindow();
+			Stage stage = null;
+			if(pagination.getScene() != null ) {
+			      stage = (Stage) pagination.getScene().getWindow();
+			}
 			File file = fileChooser.showOpenDialog(stage);
 			// modified the code to open only files with .pdf extension
 			if (null != file) {
@@ -360,6 +389,7 @@ public class AIRViewerController implements Initializable {
 				}
 				currentPageImageView = new ImageView(model.getImage(index));
 				pageImageGroup.getChildren().clear();
+				zoomImage(currentPageImageView);
 				pageImageGroup.getChildren().add(currentPageImageView);
 				System.out.println("page" + index);
 				System.out.println("numberofpages : " + model.numPages());
@@ -574,6 +604,70 @@ public class AIRViewerController implements Initializable {
 		initNavigation();
 		//initializing remove page feature
 		initPageRemove();
+	}
+	
+	void zoomImage(ImageView imageView) {
+		System.out.print("imageView.getFitHeight(): " + imageView.getImage().getHeight() + "\n");
+		System.out.print("imageView.getFitWidth(): " + imageView.getImage().getWidth() + "\n");
+		currentPageDimensions = new PageDimensions(imageView.getImage().getWidth(), imageView.getImage().getHeight());
+		zoom.addListener(new InvalidationListener() {
+			@Override
+			public void invalidated(Observable arg0) {
+				int width = (int) (imageView.getImage().getWidth() * zoom.get());
+				int height = (int) (imageView.getImage().getHeight() * zoom.get());
+				imageView.setFitWidth(width);
+				System.out.print("width: " + (width) + "px\n");
+				imageView.setFitHeight(height);
+				System.out.print("height: " + height + "px\n");
+				// ==================================================
+			}
+		});
+		imageView.preserveRatioProperty().set(true);
+		scrollPane.setPannable(true);
+		scrollPane.setStyle(scrollCssLayout);
+		scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollPane.setContent(imageView);
+
+	}
+
+	@FXML
+	private void zoomIn() {
+		new ZoomInZoomOut().zoomIn(zoom);
+
+	}
+
+	@FXML
+	private void zoomOut() {
+		new ZoomInZoomOut().zoomOut(zoom);
+
+	}
+
+	@FXML
+	private void zoomFit() {
+		double horizZoom = (scrollPane.getWidth() - 20) / currentPageDimensions.width;
+		double verticalZoom = (scrollPane.getHeight() - 20) / currentPageDimensions.height;
+		zoom.set(Math.min(horizZoom, verticalZoom));
+	}
+
+	@FXML
+	private void zoomWidth() {
+		zoom.set((scrollPane.getWidth() - 20) / currentPageDimensions.width);
+	}
+
+	private class PageDimensions {
+		private double width;
+		private double height;
+
+		PageDimensions(double width, double height) {
+			this.width = width;
+			this.height = height;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("[%.1f, %.1f]", width, height);
+		}
 	}
 
 	@FXML

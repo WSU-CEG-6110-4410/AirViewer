@@ -53,6 +53,12 @@
         </menus>
       </MenuBar>
       <HBox layoutX="50.0" layoutY="60.0" prefHeight="50.0" spacing="5" prefWidth="500.0">
+      	<Button mnemonicParsing="false" onAction="#zoomIn" text="+">
+ 
+           </Button>
+           <Button mnemonicParsing="false" onAction="#zoomOut" text="-">
+ 
+           </Button>
       	<ProgressBar fx:id="progressBar" progress="0.0" />
  		<ProgressIndicator fx:id="progressIndicator" progress="0.0" />
       	<TextField fx:id="textFieldValue" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" 
