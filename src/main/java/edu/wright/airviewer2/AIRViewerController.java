@@ -5,10 +5,12 @@
  */
 package edu.wright.airviewer2;
 
+import edu.wright.airviewer2.AIRViewerModel;
 import edu.wright.airviewer2.AIRViewer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.System.Logger;
@@ -35,6 +37,7 @@ import java.awt.image.BufferedImage;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
+import javafx.scene.layout.VBox;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -56,7 +59,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.util.Calendar;
 import javafx.stage.WindowEvent;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.TextPosition;
 import javax.swing.JOptionPane;
@@ -115,9 +120,31 @@ public class AIRViewerController implements Initializable {
 	@FXML
 	private ProgressIndicator progressIndicator;
 
+	@FXML
+	private MenuItem mergeFileMenuItem;
+
+	@FXML
+	private MenuItem signMenuItem; // Allows the user to sign a document
+
+	// Opens a modal to display information about the app
+	@FXML
+	private MenuItem aboutMenuItem;
+
 	private AIRViewerModel model;
 
 	private ImageView currentPageImageView;
+	
+	@FXML
+	VBox rightControls; // Controls on the Rights side of the Scene
+
+	@FXML
+	private TextField navigateInput; // Input a page to Navigate to
+
+	@FXML
+	private Button navigateButton; // Perform page indexed navigation actions
+
+	@FXML
+	Label navigateWarning; // Display a warning concerning invalid Navigation input
 
 	private Group pageImageGroup;
 
@@ -222,6 +249,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(false);
 			addTextAnnotationMenuItem.setDisable(false);
 			deleteAnnotationMenuItem.setDisable(0 >= model.getSelectionSize());
+			rightControls.setDisable(false);
 
 			if (null != currentPageImageView) {
 				int pageIndex = pagination.getCurrentPageIndex();
@@ -272,6 +300,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(true);
 			addTextAnnotationMenuItem.setDisable(true);
 			deleteAnnotationMenuItem.setDisable(true);
+			rightControls.setDisable(true);
 
 		}
 	}
@@ -295,6 +324,8 @@ public class AIRViewerController implements Initializable {
 				: "fx:id=\"addTextAnnotationMenuItem\" was not injected: check your FXML file 'simple.fxml'.";
 		assert deleteAnnotationMenuItem != null
 				: "fx:id=\"deleteAnnotationMenuItem\" was not injected: check your FXML file 'simple.fxml'.";
+		assert mergeFileMenuItem != null 
+			    : "fx:id=\"mergeFileMenuItem\" was not injected: check your FXML file 'simple.fxml'.";
 
 		model = aModel;
 
@@ -402,10 +433,69 @@ public class AIRViewerController implements Initializable {
 					refreshUserInterface();
 				}
 			});
+			
+			mergeFileMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent e) {
+					try {
+						new SplitAndMerge().mergefile(pagination, model);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+
+				}
+			});
 		}
 
 		refreshUserInterface();
 		return model;
+	}
+
+	//Initializing Sign menu item
+	private void initSignMenu() {
+
+        signMenuItem.setOnAction(e -> signDocument());
+    }
+	
+	private void signDocument() {
+        // Create a Page object
+        PDPage pdPage = new PDPage();
+        // Add the page to the document and save the document to a desired file.
+        model.wrappedDocument.addPage(pdPage);
+
+        try {
+
+            PDSignature pdSignature = new PDSignature();
+            pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
+            pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
+
+            pdSignature.setName("AirViewer Crew");
+            pdSignature.setLocation("WFH");
+            pdSignature.setReason("Signature Validation");
+            pdSignature.setSignDate(Calendar.getInstance());
+            model.wrappedDocument.addSignature(pdSignature, null);
+
+            model.wrappedDocument.save(path);
+            MessageBox.show("Added Signature successfully", "Alert");
+
+        } catch (IOException ioe) {
+            System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
+            MessageBox.show("Error while saving pdf. Please try again later"," Sorry for Causing incovinience!");
+        }
+
+    }
+
+
+	/*
+	 * Initializes about menu function
+	 */
+	private void aboutMenu() {
+
+		String msg = "This is a small JavaFX application built using Apache PDFBox, "
+				+ "maven, and NetBeans IDE to enable annotation of PDF documents "
+				+ "and text extraction with unlimited undo and redo.";
+
+		aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
 	}
 
 	@Override
@@ -417,6 +507,9 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
+
+		// Initialize about menu control
+		aboutMenu();
 	}
 
 	@FXML
@@ -426,50 +519,8 @@ public class AIRViewerController implements Initializable {
 	@FXML
 	private void download() throws IOException {
 		System.out.println("textfieldvalue" + textFieldValue.getText());
-		Splitter splitter = new Splitter();
-		DirectoryChooser dirChooser = new DirectoryChooser();
-		dirChooser.setTitle("Select a folder");
-		File selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
-		String selectedDirPath = selectedDir.getAbsolutePath();
-		SimpleDateFormat sf = new SimpleDateFormat("ddmmyyyHHMMSS");
-
-		PDFMergerUtility PDFmerger = new PDFMergerUtility();
-		PDDocument document = PDDocument.load(new File(model.getPathName()));
-		List<PDDocument> pages = splitter.split(document);
-		Iterator<PDDocument> iterator = pages.listIterator();
-
-		// Saving each page as an individual document
-		PDDocument document1 = new PDDocument();
-		OutputStream out = new ByteArrayOutputStream();
-		boolean flag = false;
-		String[] values = textFieldValue.getText().split(",");
-		System.out.println("valueslength" + values.length);
-		int count = 1;
-		for (int i = 0; i < values.length; i++) {
-			System.out.println("i..." + values[i]);
-			for (int j = 0; j < pages.size(); j++) {
-				System.out.println("j..." + j);
-				if (values[i].equals((j + 1) + "")) {
-					System.out.println("values.........." + values[i]);
-
-					File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
-					flag = true;
-					PDDocument pd = pages.get(j);
-					pd.save(tempfile);
-					PDFmerger.addSource(tempfile);
-				}
-			}
-		}
-		if (flag) {
-			String name = "split" + sf.format(new Date()) + ".pdf";
-			String path = selectedDirPath + "/" + name;
-			PDFmerger.setDestinationFileName(path);
-			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-		}
-		for (int i = 0; i < values.length; i++) {
-			File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
-			tempfile.delete();
-		}
+		String value = textFieldValue.getText();
+	    new SplitAndMerge().splitter(value,pagination,model); 
 	}
 
 }
