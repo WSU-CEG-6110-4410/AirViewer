@@ -105,9 +105,10 @@ public class AIRViewerController implements Initializable {
 
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
-	
+
+	// Opens a modal to display information about the app
 	@FXML
-    private MenuItem aboutMenuItem; // Opens a modal to display information about the app
+	private MenuItem aboutMenuItem;
 
 	private AIRViewerModel model;
 
@@ -395,20 +396,18 @@ public class AIRViewerController implements Initializable {
 		refreshUserInterface();
 		return model;
 	}
-	
-	 /**
-     * Initializes about menu function
-     */
 
-    private void aboutMenu() {
-        
-        String msg ="This is a small JavaFX application built using Apache PDFBox, "
-        		+ "maven, and NetBeans IDE to enable annotation of PDF documents "
-        		+ "and text extraction with unlimited undo and redo.";
+	/*
+	 * Initializes about menu function
+	 */
+	private void aboutMenu() {
 
-        aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
-    }
+		String msg = "This is a small JavaFX application built using Apache PDFBox, "
+				+ "maven, and NetBeans IDE to enable annotation of PDF documents "
+				+ "and text extraction with unlimited undo and redo.";
 
+		aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
+	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -419,7 +418,7 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
-		//Initialize about menu control
+		// Initialize about menu control
 		aboutMenu();
 	}
 
