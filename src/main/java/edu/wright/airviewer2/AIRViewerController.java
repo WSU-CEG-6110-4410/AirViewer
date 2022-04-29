@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import javafx.scene.layout.VBox;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
@@ -53,6 +54,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -69,6 +72,7 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.TextPosition;
 import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -118,19 +122,28 @@ public class AIRViewerController implements Initializable {
 	private MenuItem deleteAnnotationMenuItem;
 	
 	@FXML
+	private ProgressBar progressBar;
+	 
+	@FXML
+	private ProgressIndicator progressIndicator;
+
+	@FXML
 	private MenuItem mergeFileMenuItem;
 
 	@FXML
 	private MenuItem signMenuItem; // Allows the user to sign a document
 
-	// Opens a modal to display information about the app
 	@FXML
-	private MenuItem aboutMenuItem;
+	Button removePageButton; // Remove the current page in the Document
+	
+
+	@FXML
+	private MenuItem aboutMenuItem; // Opens a modal to display information about the app
 
 	private AIRViewerModel model;
 
 	private ImageView currentPageImageView;
-	
+
 	@FXML
 	VBox rightControls; // Controls on the Rights side of the Scene
 
@@ -378,6 +391,12 @@ public class AIRViewerController implements Initializable {
 				pageImageGroup.getChildren().clear();
 				zoomImage(currentPageImageView);
 				pageImageGroup.getChildren().add(currentPageImageView);
+				System.out.println("page" + index);
+				System.out.println("numberofpages : " + model.numPages());
+				double percentage = new ProgressBarAndIndicator().getPercentage(index, model);
+				System.out.println("percentage : " + percentage);
+				progressBar.setProgress(percentage);
+				progressIndicator.setProgress(percentage);
 				model.deselectAll();
 				refreshUserInterface();
 				return pageImageGroup;
@@ -466,40 +485,54 @@ public class AIRViewerController implements Initializable {
 		return model;
 	}
 
-	//Initializing Sign menu item
+	/**
+	 * Initializes the page control for the creation and deletion of
+	 */
+
+	private void initPageRemove() {
+		removePageButton.setOnAction((ActionEvent e) -> {
+			int pageIndex = pagination.getCurrentPageIndex();
+			PDPage page = model.wrappedDocument.getPage(pageIndex);
+			model.wrappedDocument.removePage(page);
+			refreshUserInterface();
+			pagination.setCurrentPageIndex(pageIndex == 0 ? 0 : pageIndex - 1);
+		});
+
+	}
+
+	// Initializing Sign menu item
 	private void initSignMenu() {
 
-        signMenuItem.setOnAction(e -> signDocument());
-    }
-	
+		signMenuItem.setOnAction(e -> signDocument());
+	}
+
 	private void signDocument() {
-        // Create a Page object
-        PDPage pdPage = new PDPage();
-        // Add the page to the document and save the document to a desired file.
-        model.wrappedDocument.addPage(pdPage);
+		// Create a Page object
+		PDPage pdPage = new PDPage();
+		// Add the page to the document and save the document to a desired file.
+		model.wrappedDocument.addPage(pdPage);
 
-        try {
+		try {
 
-            PDSignature pdSignature = new PDSignature();
-            pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
-            pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
+			PDSignature pdSignature = new PDSignature();
+			pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
+			pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
 
-            pdSignature.setName("AirViewer Crew");
-            pdSignature.setLocation("WFH");
-            pdSignature.setReason("Signature Validation");
-            pdSignature.setSignDate(Calendar.getInstance());
-            model.wrappedDocument.addSignature(pdSignature, null);
+			pdSignature.setName("AirViewer Crew");
+			pdSignature.setLocation("WFH");
+			pdSignature.setReason("Signature Validation");
+			pdSignature.setSignDate(Calendar.getInstance());
+			model.wrappedDocument.addSignature(pdSignature, null);
 
-            model.wrappedDocument.save(path);
-            MessageBox.show("Added Signature successfully", "Alert");
+			model.wrappedDocument.save(path);
+			MessageBox.show("Added Signature successfully", "Alert");
 
-        } catch (IOException ioe) {
-            System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
-            MessageBox.show("Error while saving pdf. Please try again later"," Sorry for Causing incovinience!");
-        }
+		} catch (IOException ioe) {
+			System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
+			MessageBox.show("Error while saving pdf. Please try again later", " Sorry for Causing incovinience!");
+		}
 
-    }
-
+	}
 
 	/*
 	 * Initializes about menu function
@@ -512,6 +545,46 @@ public class AIRViewerController implements Initializable {
 
 		aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
 	}
+	/**
+     * This method extracts an integer value from the navigate input control
+     * If the input is not an integer then the method catches a TypeError exception
+     * If the input is indeed an integer then the method sets the new page index
+     * provided it's a valid page index
+     * All errors are sent to navigationWarning control
+     */
+    private void navigateToPage() {
+        try {
+            int page = Integer.parseInt(navigateInput.getText());
+
+            if (page <= 0) {
+                navigateWarning.setText("Invalid input : less than 1");
+                return;
+            }
+
+            if (page > pagination.getPageCount()) {
+                navigateWarning.setText("Invalid input : select under " + (pagination.getPageCount() + 1));
+                return;
+            }
+
+            pagination.setCurrentPageIndex(page - 1);
+
+            navigateWarning.setText("");
+        } catch (Exception e) {
+            System.out.println(e);
+            MessageBox.show(e.toString(), "Exception");
+            navigateWarning.setVisible(true);
+            navigateWarning.setText("Invalid input");
+        }
+    }
+    
+    /**
+     * Initializes navigation methods
+     */
+
+    private void initNavigation() {
+        navigateButton.setOnAction(e -> navigateToPage());
+    }
+
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -525,6 +598,12 @@ public class AIRViewerController implements Initializable {
 
 		// Initialize about menu control
 		aboutMenu();
+		// Initialize sign menu
+		initSignMenu();
+		//initializing navigate button
+		initNavigation();
+		//initializing remove page feature
+		initPageRemove();
 	}
 	
 	void zoomImage(ImageView imageView) {

@@ -47,6 +47,7 @@
             <items>
 
               	  <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About" />
+              	  <MenuItem fx:id="signMenuItem" mnemonicParsing="false" text="Sign Document" />
             </items>
           </Menu>
         </menus>
@@ -58,9 +59,11 @@
            <Button mnemonicParsing="false" onAction="#zoomOut" text="-">
  
            </Button>
+      	<ProgressBar fx:id="progressBar" progress="0.0" />
+ 		<ProgressIndicator fx:id="progressIndicator" progress="0.0" />
       	<TextField fx:id="textFieldValue" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" 
-AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
- 	<Button mnemonicParsing="false" onAction="#download" text="Download">
+			AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+ 		<Button mnemonicParsing="false" onAction="#download" text="Download">
 	 </Button>
  	 </HBox>
 	 </Pane>
@@ -71,6 +74,9 @@ AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0
             <Label fx:id="navigateWarning" prefHeight="16.0" prefWidth="196.0" textFill="#ff6666" />
             <TextField fx:id="navigateInput" promptText="Navigate to Page" />
             <Button fx:id="navigateButton" mnemonicParsing="false" text="Navigate" />
+            <Separator prefWidth="200.0" />
+            <Button fx:id="removePageButton" mnemonicParsing="false" style="-fx-background-color: #f00;" text="Remove current page" textFill="WHITE" />
+            <Separator prefWidth="200.0" />
          </children>
       </VBox>
    </left>
