@@ -45,7 +45,8 @@
           </Menu>         
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+
+              	  <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About" />
             </items>
           </Menu>
         </menus>
@@ -57,6 +58,14 @@ AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0
 	 </Button>
  	 </HBox>
 	 </Pane>
- 	
    </top>
+    <left>
+      <VBox fx:id="rightControls" style="-fx-background-color: #0002; -fx-padding: 10; -fx-spacing: 10;" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="navigateWarning" prefHeight="16.0" prefWidth="196.0" textFill="#ff6666" />
+            <TextField fx:id="navigateInput" promptText="Navigate to Page" />
+            <Button fx:id="navigateButton" mnemonicParsing="false" text="Navigate" />
+         </children>
+      </VBox>
+   </left>
 </BorderPane>

@@ -37,6 +37,7 @@ import java.awt.image.BufferedImage;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import java.util.ResourceBundle;
+import javafx.scene.layout.VBox;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -56,7 +57,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.util.Calendar;
 import javafx.stage.WindowEvent;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.TextPosition;
 import javax.swing.JOptionPane;
@@ -111,9 +114,28 @@ public class AIRViewerController implements Initializable {
 	@FXML
 	private MenuItem mergeFileMenuItem;
 
+	@FXML
+	private MenuItem signMenuItem; // Allows the user to sign a document
+
+	// Opens a modal to display information about the app
+	@FXML
+	private MenuItem aboutMenuItem;
+
 	private AIRViewerModel model;
 
 	private ImageView currentPageImageView;
+	
+	@FXML
+	VBox rightControls; // Controls on the Rights side of the Scene
+
+	@FXML
+	private TextField navigateInput; // Input a page to Navigate to
+
+	@FXML
+	private Button navigateButton; // Perform page indexed navigation actions
+
+	@FXML
+	Label navigateWarning; // Display a warning concerning invalid Navigation input
 
 	private Group pageImageGroup;
 
@@ -218,6 +240,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(false);
 			addTextAnnotationMenuItem.setDisable(false);
 			deleteAnnotationMenuItem.setDisable(0 >= model.getSelectionSize());
+			rightControls.setDisable(false);
 
 			if (null != currentPageImageView) {
 				int pageIndex = pagination.getCurrentPageIndex();
@@ -268,6 +291,7 @@ public class AIRViewerController implements Initializable {
 			addEllipseAnnotationMenuItem.setDisable(true);
 			addTextAnnotationMenuItem.setDisable(true);
 			deleteAnnotationMenuItem.setDisable(true);
+			rightControls.setDisable(true);
 
 		}
 	}
@@ -412,6 +436,53 @@ public class AIRViewerController implements Initializable {
 		return model;
 	}
 
+	//Initializing Sign menu item
+	private void initSignMenu() {
+
+        signMenuItem.setOnAction(e -> signDocument());
+    }
+	
+	private void signDocument() {
+        // Create a Page object
+        PDPage pdPage = new PDPage();
+        // Add the page to the document and save the document to a desired file.
+        model.wrappedDocument.addPage(pdPage);
+
+        try {
+
+            PDSignature pdSignature = new PDSignature();
+            pdSignature.setFilter(PDSignature.FILTER_VERISIGN_PPKVS);
+            pdSignature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_SHA1);
+
+            pdSignature.setName("AirViewer Crew");
+            pdSignature.setLocation("WFH");
+            pdSignature.setReason("Signature Validation");
+            pdSignature.setSignDate(Calendar.getInstance());
+            model.wrappedDocument.addSignature(pdSignature, null);
+
+            model.wrappedDocument.save(path);
+            MessageBox.show("Added Signature successfully", "Alert");
+
+        } catch (IOException ioe) {
+            System.out.println("Error while saving pdf. Please try again later" + ioe.getMessage());
+            MessageBox.show("Error while saving pdf. Please try again later"," Sorry for Causing incovinience!");
+        }
+
+    }
+
+
+	/*
+	 * Initializes about menu function
+	 */
+	private void aboutMenu() {
+
+		String msg = "This is a small JavaFX application built using Apache PDFBox, "
+				+ "maven, and NetBeans IDE to enable annotation of PDF documents "
+				+ "and text extraction with unlimited undo and redo.";
+
+		aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
+	}
+
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 
@@ -421,6 +492,9 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
+
+		// Initialize about menu control
+		aboutMenu();
 	}
 
 	@FXML
