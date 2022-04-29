@@ -5,10 +5,12 @@
  */
 package edu.wright.airviewer2;
 
+import edu.wright.airviewer2.AIRViewerModel;
 import edu.wright.airviewer2.AIRViewer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.System.Logger;
@@ -109,6 +111,9 @@ public class AIRViewerController implements Initializable {
 	@FXML
 	private MenuItem deleteAnnotationMenuItem;
 	
+	@FXML
+	private MenuItem mergeFileMenuItem;
+
 	@FXML
 	private MenuItem signMenuItem; // Allows the user to sign a document
 
@@ -310,6 +315,8 @@ public class AIRViewerController implements Initializable {
 				: "fx:id=\"addTextAnnotationMenuItem\" was not injected: check your FXML file 'simple.fxml'.";
 		assert deleteAnnotationMenuItem != null
 				: "fx:id=\"deleteAnnotationMenuItem\" was not injected: check your FXML file 'simple.fxml'.";
+		assert mergeFileMenuItem != null 
+			    : "fx:id=\"mergeFileMenuItem\" was not injected: check your FXML file 'simple.fxml'.";
 
 		model = aModel;
 
@@ -411,6 +418,18 @@ public class AIRViewerController implements Initializable {
 					refreshUserInterface();
 				}
 			});
+			
+			mergeFileMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent e) {
+					try {
+						new SplitAndMerge().mergefile(pagination, model);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+
+				}
+			});
 		}
 
 		refreshUserInterface();
@@ -485,50 +504,8 @@ public class AIRViewerController implements Initializable {
 	@FXML
 	private void download() throws IOException {
 		System.out.println("textfieldvalue" + textFieldValue.getText());
-		Splitter splitter = new Splitter();
-		DirectoryChooser dirChooser = new DirectoryChooser();
-		dirChooser.setTitle("Select a folder");
-		File selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
-		String selectedDirPath = selectedDir.getAbsolutePath();
-		SimpleDateFormat sf = new SimpleDateFormat("ddmmyyyHHMMSS");
-
-		PDFMergerUtility PDFmerger = new PDFMergerUtility();
-		PDDocument document = PDDocument.load(new File(model.getPathName()));
-		List<PDDocument> pages = splitter.split(document);
-		Iterator<PDDocument> iterator = pages.listIterator();
-
-		// Saving each page as an individual document
-		PDDocument document1 = new PDDocument();
-		OutputStream out = new ByteArrayOutputStream();
-		boolean flag = false;
-		String[] values = textFieldValue.getText().split(",");
-		System.out.println("valueslength" + values.length);
-		int count = 1;
-		for (int i = 0; i < values.length; i++) {
-			System.out.println("i..." + values[i]);
-			for (int j = 0; j < pages.size(); j++) {
-				System.out.println("j..." + j);
-				if (values[i].equals((j + 1) + "")) {
-					System.out.println("values.........." + values[i]);
-
-					File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
-					flag = true;
-					PDDocument pd = pages.get(j);
-					pd.save(tempfile);
-					PDFmerger.addSource(tempfile);
-				}
-			}
-		}
-		if (flag) {
-			String name = "split" + sf.format(new Date()) + ".pdf";
-			String path = selectedDirPath + "/" + name;
-			PDFmerger.setDestinationFileName(path);
-			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-		}
-		for (int i = 0; i < values.length; i++) {
-			File tempfile = new File(selectedDirPath + "/" + "temp_" + values[i] + ".pdf");
-			tempfile.delete();
-		}
+		String value = textFieldValue.getText();
+	    new SplitAndMerge().splitter(value,pagination,model); 
 	}
 
 }
