@@ -10,10 +10,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.apache.pdfbox.multipdf.Splitter;
-import org.apache.pdfbox.pdmodel.PDDocument;
 
 import com.google.java.contract.Invariant;
 import com.google.java.contract.Requires;
@@ -21,9 +17,7 @@ import com.google.java.contract.Ensures;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Pagination;
-import javafx.scene.control.Alert.AlertType;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
