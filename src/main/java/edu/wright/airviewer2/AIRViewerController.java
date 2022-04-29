@@ -111,6 +111,10 @@ public class AIRViewerController implements Initializable {
 	@FXML
 	private MenuItem signMenuItem; // Allows the user to sign a document
 
+	// Opens a modal to display information about the app
+	@FXML
+	private MenuItem aboutMenuItem;
+
 	private AIRViewerModel model;
 
 	private ImageView currentPageImageView;
@@ -432,6 +436,18 @@ public class AIRViewerController implements Initializable {
     }
 
 
+	/*
+	 * Initializes about menu function
+	 */
+	private void aboutMenu() {
+
+		String msg = "This is a small JavaFX application built using Apache PDFBox, "
+				+ "maven, and NetBeans IDE to enable annotation of PDF documents "
+				+ "and text extraction with unlimited undo and redo.";
+
+		aboutMenuItem.setOnAction(e -> MessageBox.show(msg, "About AirViewer"));
+	}
+
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 
@@ -441,8 +457,8 @@ public class AIRViewerController implements Initializable {
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
 			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
 		});
-		//Initialize menu controls
-		initSignMenu();
+		// Initialize about menu control
+		aboutMenu();
 	}
 
 	@FXML

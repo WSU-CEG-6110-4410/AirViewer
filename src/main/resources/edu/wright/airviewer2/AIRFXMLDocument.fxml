@@ -40,8 +40,8 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-              <MenuItem fx:id="signMenuItem" mnemonicParsing="false" text="Sign Document" />
+
+              	  <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About" />
             </items>
           </Menu>
         </menus>
