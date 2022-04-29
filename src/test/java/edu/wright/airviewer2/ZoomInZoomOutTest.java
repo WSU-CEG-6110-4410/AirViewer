@@ -16,7 +16,11 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Slider;
 
 public class ZoomInZoomOutTest {
-
+	
+	/**
+	  * [issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/10)
+	  * These are the test cases for ZoomIn functionality
+	  */
 
 	@Test
 	public void testZoomIn() {
@@ -24,6 +28,11 @@ public class ZoomInZoomOutTest {
 		//doubleProperty.bind(slider.valueProperty());
 		new ZoomInZoomOut().zoomIn(doubleProperty) ;
 	}
+	
+	/**
+	  * [issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/10)
+	  * These are the test cases for ZoomOut functionality
+	  */
 
 	@Test
 	public void testZoomOut() {
