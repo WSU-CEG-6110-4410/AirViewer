@@ -15,14 +15,47 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import com.google.java.contract.Ensures;
+import com.google.java.contract.Requires;
+
+
 import javafx.scene.control.Pagination;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class SplitAndMerge  {
-
-	
+    private String textFieldValue; 
+    private boolean result;
+	/**
+	  * [issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/30)
+	  * [Pull request] (https://github.com/WSU-CEG-6110-4410/AirViewer/pull/37) 
+	  * \brief      Pdf Merge file method
+	  * 
+	  * \details    In menu bar there is option to click merge file.Once click merge file ,system prompt to 
+	  *             choose pdf file,once choose,system again prompt user to choose folder to save merge pdf.
+	  *             current existing pdf file can be merge with choosen file and combine as pdf.
+	  *             Generated pdf name contain current date and time.Using date with format "ddmmyyyHHMMSS".
+	  *             So the final generated pdf file contain name "merge-{ddmmyyyHHMMSS}.pdf".
+	  *             Example pdf file name "merge-12042022021238.pdf".
+	  *             This method used "PDFMergerUtility" to merge more than one pdf file.
+	  *             This method used "SimpleDateFormat" class to get the current date and time for file name.
+	  *          
+	  * \note       system prompt to choose file to merge pdf.If user user did not choose file,
+	  *             system not generate pdf.
+	  *          
+	  * \param[in]  Pagination  get the pdf with page count
+	  * 
+	  * \param[in]  model       get the wrapped model with model view
+	  * 
+	  * \param[out] void  
+	  * 
+	  * \retval     show success dialog box with pdf name contain data time format.
+	  *             Format pdf :"merge-{ddmmyyyyHHMMSS}.pdf". 
+	  *             Example pdf filem name "merge-12042022011236.pdf" 
+	  *                     
+	  * 
+	  */
 	 public void mergefile(Pagination pagination, AIRViewerModel model) throws Exception  {
          FileChooser fileChooser = new FileChooser();
          FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
@@ -65,9 +98,42 @@ public class SplitAndMerge  {
           
        }
     
-
+	 /**
+	  * [Issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/29)
+	  * \brief     Pdf splitter method
+	  * 
+	  * \details   current existing pdf file pages can be split and combine as pdf.
+	  *            In UI,can view text box to choose pages.Text field value should be comma separated
+	  *            values.Let say user choose 1,2 pages and click download button,
+	  *            then prompt user to select folder to save pdf.Generated pdf name contain 
+	  *            current date and time.Using date with format "ddmmyyyHHMMSS".
+	  *            So the final generated pdf file contain name "split-{ddmmyyyHHMMSS}.pdf".
+	  *            Example pdf file name "split-12042022011236.pdf".
+	  *            This method used "PDFMergerUtility" to merge more than one pdf file.
+	  *            This method used "SimpleDateFormat" class to get the current date and time for file name.
+	  *          
+	  * \note      system prompt to choose folder to save split pdf.If  user did not choose folder
+	  *            system not generate pdf
+	  *          
+	  * \param[in]  textFieldValue  get the pdf pages to split,values are camma separated
+	  * 
+	  * \param[in]  Pagination      get the pdf with page count
+	  * 
+	  * \param[in]  model           get the wrapped model with model view
+	  * 
+	  * \param[out] void  
+	  * 
+	  * \retval     show success dialog box with pdf name contain data time format.
+	  *             Format Example:"split-{ddmmyyyyHHMMSS}.pdf".  
+	  *                     
+	  * 
+	  */
+	 
+	 @Requires("textFieldValue != null")
+	 @Ensures("result == true")
 	 public void splitter(String textFieldValue, Pagination pagination, AIRViewerModel model) {
 			try {
+			this.textFieldValue= textFieldValue;	
 			Splitter splitter = new Splitter();
 		       DirectoryChooser dirChooser = new DirectoryChooser();
 
@@ -75,7 +141,7 @@ public class SplitAndMerge  {
 
 		       File selectedDir = null;
 		       if(pagination.getScene() != null) {
-		    	   selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());
+		    	   selectedDir =  dirChooser.showDialog((Stage) pagination.getScene().getWindow());
 		       } else {
 		        	 Path currentDir = Paths.get(".");
 		       		String current = currentDir.toAbsolutePath() + "/src/test/resources/";
@@ -119,6 +185,7 @@ public class SplitAndMerge  {
 		       }
 		       
 		       if(flag) {
+		    	   this.result= flag;
 		    	   String name = "split-"+sf.format(new Date()) +".pdf";
 		    	   String path = selectedDirPath + "/" + name;
 				   PDFmerger.setDestinationFileName(path);
