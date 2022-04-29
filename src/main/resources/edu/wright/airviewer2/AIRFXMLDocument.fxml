@@ -38,8 +38,14 @@
               <MenuItem fx:id="deleteAnnotationMenuItem" mnemonicParsing="false" text="Delete Annotation" />
             </items>
           </Menu>
+          <Menu mnemonicParsing="false" text="Merge">
+            <items>
+               <MenuItem fx:id="mergeFileMenuItem" mnemonicParsing="false" text="Merge File" />
+            </items>
+          </Menu>         
           <Menu mnemonicParsing="false" text="Help">
             <items>
+
               	  <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About" />
             </items>
           </Menu>
@@ -58,19 +64,14 @@ AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0
 	 </Button>
  	 </HBox>
 	 </Pane>
- 	
    </top>
-<!--   <bottom>
-      <HBox prefHeight="50.0" prefWidth="400.0" BorderPane.alignment="CENTER">
-        <children>
-           <Button mnemonicParsing="false" onAction="#zoomIn" text="+">
- 
-           </Button>
-           <Button mnemonicParsing="false" onAction="#zoomOut" text="-">
- 
-           </Button>
- 
-          </children>
-         </HBox>
-     </bottom>  -->
+    <left>
+      <VBox fx:id="rightControls" style="-fx-background-color: #0002; -fx-padding: 10; -fx-spacing: 10;" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="navigateWarning" prefHeight="16.0" prefWidth="196.0" textFill="#ff6666" />
+            <TextField fx:id="navigateInput" promptText="Navigate to Page" />
+            <Button fx:id="navigateButton" mnemonicParsing="false" text="Navigate" />
+         </children>
+      </VBox>
+   </left>
 </BorderPane>
