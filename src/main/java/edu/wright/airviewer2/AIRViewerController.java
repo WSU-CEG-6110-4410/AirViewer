@@ -180,7 +180,7 @@ public class AIRViewerController implements Initializable {
 
 	private String path;
 
-	private AIRViewerModel promptLoadModel(String startPath) {
+	public AIRViewerModel promptLoadModel(String startPath) {
 
 		AIRViewerModel loadedModel = null;
 		try {
