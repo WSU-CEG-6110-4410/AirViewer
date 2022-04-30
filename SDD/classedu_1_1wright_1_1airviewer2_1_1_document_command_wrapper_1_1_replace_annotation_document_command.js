@@ -1,6 +1,0 @@
-var classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_replace_annotation_document_command =
-[
-    [ "ReplaceAnnotationDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_replace_annotation_document_command_a25c0a5650a9a916e03dca6c4754977a5.html#a25c0a5650a9a916e03dca6c4754977a5", null ],
-    [ "execute", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_replace_annotation_document_command_af9b6e88ad2b0860d2eab722b3682fd64.html#af9b6e88ad2b0860d2eab722b3682fd64", null ],
-    [ "getName", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_replace_annotation_document_command_afcf6d4742907179c964ec1a72e06d8c2.html#afcf6d4742907179c964ec1a72e06d8c2", null ]
-];

@@ -1,6 +1,0 @@
-var classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_text_annotation_document_command =
-[
-    [ "AddTextAnnotationDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_text_annotation_document_command_a6be3eeb68bbff41101256cc2b68c7605.html#a6be3eeb68bbff41101256cc2b68c7605", null ],
-    [ "execute", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_text_annotation_document_command_ad48ed3fb899900e52966e790bae50dda.html#ad48ed3fb899900e52966e790bae50dda", null ],
-    [ "getName", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_text_annotation_document_command_a9b6921925f8c8f013ceca8bdcd3c0598.html#a9b6921925f8c8f013ceca8bdcd3c0598", null ]
-];

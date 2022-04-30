@@ -1,6 +1,0 @@
-var classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_text_document_command =
-[
-    [ "SaveTextDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_text_document_command_a6801eab186b7466ecfb174bd360ac8ce.html#a6801eab186b7466ecfb174bd360ac8ce", null ],
-    [ "execute", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_text_document_command_a384cbd808bc6a991a1d2da254e74907f.html#a384cbd808bc6a991a1d2da254e74907f", null ],
-    [ "getName", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_text_document_command_acded14b0a544210e99cfcffb819b8a15.html#acded14b0a544210e99cfcffb819b8a15", null ]
-];
