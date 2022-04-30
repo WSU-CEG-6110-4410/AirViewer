@@ -182,31 +182,37 @@ public class AIRViewerController implements Initializable {
 
 	private AIRViewerModel promptLoadModel(String startPath) {
 
-        AIRViewerModel loadedModel = null;
-        try {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open PDF File");
-            fileChooser.setInitialFileName(startPath);
-            Stage stage = (Stage) pagination.getScene().getWindow();
-            File file = fileChooser.showOpenDialog(stage);
-            if (null != file) {
-                String path = file.getCanonicalPath();
-                while(!path.endsWith(".pdf")) {
-                	JOptionPane.showMessageDialog(null, "Please select pdf files only....");
-                	file = fileChooser.showOpenDialog(stage);
-                	path = file.getCanonicalPath();
-                }
-                if(path!= null && !path.equals("")) {
-                	loadedModel = new AIRViewerModel(Paths.get(path));
-                }
-            }
-        
-        } catch (IOException ex) {
-            loadedModel = null;
-        }
+		AIRViewerModel loadedModel = null;
+		try {
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Open PDF File");
+			fileChooser.setInitialFileName(startPath);
+			Stage stage = null;
+			if(pagination.getScene() != null ) {
+			      stage = (Stage) pagination.getScene().getWindow();
+			}
+			File file = fileChooser.showOpenDialog(stage);
+			// modified the code to open only files with .pdf extension
+			if (null != file) {
+				path = file.getCanonicalPath();
+				while (!path.endsWith(".pdf")) {
+					System.out.println("select only pdf format files");
+					JOptionPane.showMessageDialog(null, "Please select pdf files only....");
+					file = fileChooser.showOpenDialog(stage);
+					path = file.getCanonicalPath();
+				}
+				loadedModel = new AIRViewerModel(Paths.get(path));
 
+			}
+		} catch (IOException ex) {
+//            Logger.getLogger(AIRViewerController.class.getName()).log(
+//                    Level.INFO,
+//                    "Unable to open <" + ex.getLocalizedMessage() + ">",
+//                    "");
+			loadedModel = null;
+		}
 
-        return loadedModel;
+		return loadedModel;
     }
 
 	private void synchronizeSelectionKnobs() {
