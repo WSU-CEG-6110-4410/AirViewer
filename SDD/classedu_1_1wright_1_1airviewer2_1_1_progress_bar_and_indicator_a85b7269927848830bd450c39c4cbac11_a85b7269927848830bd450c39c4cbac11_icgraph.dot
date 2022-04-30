@@ -1,0 +1,10 @@
+digraph "edu.wright.airviewer2.ProgressBarAndIndicator.getPercentage"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="edu.wright.airviewer2.Progress\lBarAndIndicator.getPercentage",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Issue Issue Pull request"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="edu.wright.airviewer2.Progress\lBarAndIndicatorTest.testPercentage",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classedu_1_1wright_1_1airviewer2_1_1_progress_bar_and_indicator_test_affd475765ad309557a70735044f0d219.html#affd475765ad309557a70735044f0d219",tooltip="issue issue These are the test cases for progress bar and progress indicator functionality"];
+}

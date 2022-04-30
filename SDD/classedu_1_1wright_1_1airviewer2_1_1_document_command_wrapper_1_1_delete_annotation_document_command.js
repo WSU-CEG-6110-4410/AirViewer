@@ -1,0 +1,6 @@
+var classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_delete_annotation_document_command =
+[
+    [ "DeleteAnnotationDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_delete_annotation_document_command_ad97aa789bc4c36eddf99f552a9a45b79.html#ad97aa789bc4c36eddf99f552a9a45b79", null ],
+    [ "execute", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_delete_annotation_document_command_aebfed83a01a86b1cbf4a308db0c241aa.html#aebfed83a01a86b1cbf4a308db0c241aa", null ],
+    [ "getName", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_delete_annotation_document_command_a3c051014506b40aa73ead01710767168.html#a3c051014506b40aa73ead01710767168", null ]
+];

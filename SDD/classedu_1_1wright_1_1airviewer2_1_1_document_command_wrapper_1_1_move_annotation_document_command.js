@@ -1,0 +1,7 @@
+var classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_move_annotation_document_command =
+[
+    [ "MoveAnnotationDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_move_annotation_document_command_abde91703c9c6b83da2e7bc5d85b4f9cd.html#abde91703c9c6b83da2e7bc5d85b4f9cd", null ],
+    [ "MoveAnnotationDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_move_annotation_document_command_a1e89eeb520560206351de35b15a43fa9.html#a1e89eeb520560206351de35b15a43fa9", null ],
+    [ "execute", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_move_annotation_document_command_ae73eac7437c3998da10c47c9900d9757.html#ae73eac7437c3998da10c47c9900d9757", null ],
+    [ "getName", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_move_annotation_document_command_ad5b3eb9cea06f8856e3a4f9c3d1cabf2.html#ad5b3eb9cea06f8856e3a4f9c3d1cabf2", null ]
+];

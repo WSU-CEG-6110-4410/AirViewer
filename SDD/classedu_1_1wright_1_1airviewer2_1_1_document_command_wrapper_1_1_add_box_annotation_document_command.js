@@ -1,0 +1,6 @@
+var classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_box_annotation_document_command =
+[
+    [ "AddBoxAnnotationDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_box_annotation_document_command_a9516249b3dfa8c453daec18b53174891.html#a9516249b3dfa8c453daec18b53174891", null ],
+    [ "execute", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_box_annotation_document_command_ac97e5c22ee7c8560c39c91db69c9bf94.html#ac97e5c22ee7c8560c39c91db69c9bf94", null ],
+    [ "getName", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_add_box_annotation_document_command_ae290ad05732b1e81a65459a5194abbd2.html#ae290ad05732b1e81a65459a5194abbd2", null ]
+];

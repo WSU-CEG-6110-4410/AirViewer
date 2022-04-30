@@ -1,0 +1,6 @@
+var classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_document_command =
+[
+    [ "SaveDocumentCommand", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_document_command_a547c1c90c7c68b3c6055901796c4541e.html#a547c1c90c7c68b3c6055901796c4541e", null ],
+    [ "execute", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_document_command_a5070ae972d9ceafe4a308fea2197ff21.html#a5070ae972d9ceafe4a308fea2197ff21", null ],
+    [ "getName", "classedu_1_1wright_1_1airviewer2_1_1_document_command_wrapper_1_1_save_document_command_a733070a5cb9559ad4f2545b33849936c.html#a733070a5cb9559ad4f2545b33849936c", null ]
+];

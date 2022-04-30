@@ -1,0 +1,11 @@
+digraph "edu.wright.airviewer2.DocumentCommandWrapper"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node3 [label="edu.wright.airviewer2.Document\lCommandWrapper",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node4 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="edu.wright.airviewer2.Abstract\lDocumentCommandWrapper",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classedu_1_1wright_1_1airviewer2_1_1_abstract_document_command_wrapper.html",tooltip="Instances of this class encapsulate a dictionary mapping String names to Command subclass constructor..."];
+  Node5 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" wrappedDocument" ,fontname="Helvetica"];
+  Node5 [label="PDDocument",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+}
