@@ -223,7 +223,10 @@ public class AIRViewerController implements Initializable {
 					file = fileChooser.showOpenDialog(stage);
 					path = file.getCanonicalPath();
 				}
-				loadedModel = new AIRViewerModel(Paths.get(path));
+				if(path!= null && !path.equals("")) {
+                	loadedModel = new AIRViewerModel(Paths.get(path));
+                	isClose = true;
+                }
 
 			}else {
             	int val = JOptionPane.showConfirmDialog(null, "Do you want to exit?");
