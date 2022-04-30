@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EllipseAnnotationMaker.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AirViewer2</a> &gt; <a href="index.source.html" class="el_package">edu.wright.airviewer2</a> &gt; <span class="el_source">EllipseAnnotationMaker.java</span></div><h1>EllipseAnnotationMaker.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.wright.airviewer2;
+
+import java.awt.geom.AffineTransform;
+import java.io.IOException;
+import static java.lang.Float.parseFloat;
+import static java.lang.Integer.parseInt;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
+import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationSquareCircle;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceStream;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
+import org.apache.pdfbox.util.Matrix;
+
+/**
+ *
+ * @author erik
+ */
+<span class="nc bnc" id="L34" title="All 2 branches missed.">public class EllipseAnnotationMaker {</span>
+
+    public static List&lt;PDAnnotation&gt; make(PDDocument document,
+            ArrayList&lt;String&gt; arguments) {
+<span class="nc bnc" id="L38" title="All 6 branches missed.">        assert null != arguments &amp;&amp; arguments.size() == 6;</span>
+<span class="nc bnc" id="L39" title="All 4 branches missed.">        assert null != document;</span>
+
+        List&lt;PDAnnotation&gt; result;
+
+        try {
+<span class="nc" id="L44">            int pageNumber = parseInt(arguments.get(0));</span>
+<span class="nc" id="L45">            float lowerLeftX = parseFloat(arguments.get(1));</span>
+<span class="nc" id="L46">            float lowerLeftY = parseFloat(arguments.get(2));</span>
+<span class="nc" id="L47">            float width = parseFloat(arguments.get(3));</span>
+<span class="nc" id="L48">            float height = parseFloat(arguments.get(4));</span>
+<span class="nc" id="L49">            String contents = arguments.get(5);</span>
+
+<span class="nc" id="L51">            PDFont font = PDType1Font.HELVETICA_OBLIQUE;</span>
+<span class="nc" id="L52">            final float fontSize = 16.0f; // Or whatever font size you want.</span>
+<span class="nc" id="L53">            final float lineSpacing = 4.0f;</span>
+<span class="nc" id="L54">            float textWidth = font.getStringWidth(contents) * fontSize / 1000.0f;</span>
+<span class="nc" id="L55">            final float textHeight = fontSize + lineSpacing;</span>
+
+            try {
+<span class="nc" id="L58">                PDPage page = document.getPage(pageNumber);</span>
+<span class="nc" id="L59">                PDColor red = new PDColor(new float[]{1, 0, 0}, PDDeviceRGB.INSTANCE);</span>
+<span class="nc" id="L60">                PDColor black = new PDColor(new float[]{0, 0, 0}, PDDeviceRGB.INSTANCE);</span>
+<span class="nc" id="L61">                PDBorderStyleDictionary borderThick = new PDBorderStyleDictionary();</span>
+<span class="nc" id="L62">                borderThick.setWidth(72 / 12);  // 12th inch</span>
+<span class="nc" id="L63">                PDRectangle position = new PDRectangle();</span>
+<span class="nc" id="L64">                position.setLowerLeftX(lowerLeftX);</span>
+<span class="nc" id="L65">                position.setLowerLeftY(lowerLeftY);</span>
+<span class="nc" id="L66">                position.setUpperRightX(lowerLeftX + width);</span>
+<span class="nc" id="L67">                position.setUpperRightY(lowerLeftY + height);</span>
+
+<span class="nc" id="L69">                PDAnnotationSquareCircle aCircle = new PDAnnotationSquareCircle(</span>
+                        PDAnnotationSquareCircle.SUB_TYPE_CIRCLE);
+<span class="nc" id="L71">                aCircle.setAnnotationName(UUID.randomUUID().toString());</span>
+<span class="nc" id="L72">                aCircle.setContents(contents);</span>
+<span class="nc" id="L73">                PDColor fillColor = new PDColor(new float[]{.8f, .8f, .8f}, PDDeviceRGB.INSTANCE);</span>
+<span class="nc" id="L74">                aCircle.setInteriorColor(fillColor);</span>
+<span class="nc" id="L75">                aCircle.setColor(red);</span>
+<span class="nc" id="L76">                aCircle.setBorderStyle(borderThick);</span>
+<span class="nc" id="L77">                aCircle.setRectangle(position);</span>
+
+<span class="nc" id="L79">                result = new ArrayList&lt;&gt;(page.getAnnotations()); // Copy</span>
+<span class="nc" id="L80">                page.getAnnotations().add(aCircle);</span>
+
+                // The following lines are needed for PDFRenderer to render 
+                // annotations. Preview and Acrobat don't seem to need these.
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                if (null == aCircle.getAppearance()) {</span>
+<span class="nc" id="L85">                    aCircle.setAppearance(new PDAppearanceDictionary());</span>
+<span class="nc" id="L86">                    PDAppearanceStream annotationAppearanceStream = new PDAppearanceStream(document);</span>
+<span class="nc" id="L87">                    position.setLowerLeftX(lowerLeftX - borderThick.getWidth() * 0.5f);</span>
+<span class="nc" id="L88">                    position.setLowerLeftY(lowerLeftY - borderThick.getWidth() * 0.5f);</span>
+<span class="nc" id="L89">                    position.setUpperRightX(lowerLeftX + width + borderThick.getWidth() * 0.5f);</span>
+<span class="nc" id="L90">                    position.setUpperRightY(lowerLeftY + height + borderThick.getWidth() * 0.5f);</span>
+<span class="nc" id="L91">                    annotationAppearanceStream.setBBox(position);</span>
+<span class="nc" id="L92">                    annotationAppearanceStream.setMatrix(new AffineTransform());</span>
+<span class="nc" id="L93">                    annotationAppearanceStream.setResources(page.getResources());</span>
+
+<span class="nc" id="L95">                    try (PDPageContentStream appearanceContent = new PDPageContentStream(</span>
+                            document, annotationAppearanceStream)) {
+<span class="nc" id="L97">                        Matrix transform = new Matrix();</span>
+<span class="nc" id="L98">                        appearanceContent.transform(transform);</span>
+<span class="nc" id="L99">                        appearanceContent.moveTo(lowerLeftX, lowerLeftY + height * 0.5f);</span>
+<span class="nc" id="L100">                        appearanceContent.curveTo(lowerLeftX, lowerLeftY + height * 0.75f,</span>
+                                lowerLeftX + width * 0.25f, lowerLeftY + height,
+                                lowerLeftX + width * 0.5f, lowerLeftY + height);
+<span class="nc" id="L103">                        appearanceContent.curveTo(lowerLeftX + width * 0.75f, lowerLeftY + height,</span>
+                                lowerLeftX + width, lowerLeftY + height * 0.75f,
+                                lowerLeftX + width, lowerLeftY + height * 0.5f);
+<span class="nc" id="L106">                        appearanceContent.curveTo(lowerLeftX + width, lowerLeftY + height * 0.25f,</span>
+                                lowerLeftX + width * 0.75f, lowerLeftY,
+                                lowerLeftX + width * 0.5f, lowerLeftY);
+<span class="nc" id="L109">                        appearanceContent.curveTo(lowerLeftX + width * 0.25f, lowerLeftY,</span>
+                                lowerLeftX, lowerLeftY + height * 0.25f,
+                                lowerLeftX, lowerLeftY + height * 0.5f);
+<span class="nc" id="L112">                        appearanceContent.setLineWidth(borderThick.getWidth());</span>
+<span class="nc" id="L113">                        appearanceContent.setNonStrokingColor(fillColor);</span>
+<span class="nc" id="L114">                        appearanceContent.setStrokingColor(red);</span>
+<span class="nc" id="L115">                        appearanceContent.fillAndStroke();</span>
+<span class="nc" id="L116">                        appearanceContent.moveTo(0, 0);</span>
+
+<span class="nc" id="L118">                        appearanceContent.beginText();</span>
+<span class="nc" id="L119">                        appearanceContent.setNonStrokingColor(black);</span>
+                        // Center text vertically, left justified
+<span class="nc" id="L121">                        appearanceContent.newLineAtOffset(</span>
+<span class="nc" id="L122">                                lowerLeftX + borderThick.getWidth(), </span>
+                                lowerLeftY + height * 0.5f - fontSize * 0.5f);
+<span class="nc" id="L124">                        appearanceContent.setFont(font, fontSize);</span>
+<span class="nc" id="L125">                        appearanceContent.showText(contents);</span>
+<span class="nc" id="L126">                        appearanceContent.endText();</span>
+                    }
+<span class="nc" id="L128">                    aCircle.getAppearance().setNormalAppearance(annotationAppearanceStream);</span>
+                }
+
+<span class="nc" id="L131">            } catch (IOException ex) {</span>
+//                Logger.getLogger(DocumentCommandWrapper.class.getName()).log(Level.SEVERE, null, ex);
+<span class="nc" id="L133">                result = null;</span>
+<span class="nc" id="L134">            }</span>
+<span class="nc" id="L135">        } catch (NumberFormatException | NullPointerException ex) {</span>
+//            Logger.getLogger(DocumentCommandWrapper.AddCircleAnnotationDocumentCommand.class.getName()).log(Level.SEVERE, null, ex);
+<span class="nc" id="L137">            result = null;</span>
+<span class="nc" id="L138">        } catch (IOException ex) {</span>
+//            Logger.getLogger(EllipseAnnotationMaker.class.getName()).log(Level.SEVERE, null, ex);
+<span class="nc" id="L140">            result = null;</span>
+<span class="nc" id="L141">        }</span>
+
+<span class="nc" id="L143">        return result;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

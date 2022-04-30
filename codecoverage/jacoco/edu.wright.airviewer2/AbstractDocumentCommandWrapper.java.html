@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractDocumentCommandWrapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AirViewer2</a> &gt; <a href="index.source.html" class="el_package">edu.wright.airviewer2</a> &gt; <span class="el_source">AbstractDocumentCommandWrapper.java</span></div><h1>AbstractDocumentCommandWrapper.java</h1><pre class="source lang-java linenums">/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package edu.wright.airviewer2;
+
+import java.awt.Rectangle;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+
+/**
+ * Instances of this class encapsulate a dictionary mapping String names to
+ * Command subclass constructors as well as Undo and Redo stacks that enable
+ * undo or redo of operations performed by instances of the Command class.
+ *
+ * @author erik
+ */
+public abstract class AbstractDocumentCommandWrapper {
+
+    /**
+     *
+     */
+    public static interface makeCommand {
+
+        public AbstractDocumentCommand make(AbstractDocumentCommandWrapper anOwner, ArrayList&lt;String&gt; args);
+    }
+    /**
+     *
+     */
+    protected final PDDocument wrappedDocument;
+    
+    /**
+     *
+     */
+    private final Stack&lt;AbstractDocumentCommand&gt; undoStack;
+
+    /**
+     *
+     */
+    private final Stack&lt;AbstractDocumentCommand&gt; redoStack;
+
+    /**
+     *
+     */
+<span class="fc" id="L66">    private static HashMap&lt;String, makeCommand&gt; nameToFactoryMap</span>
+            = nameToFactoryMap = new HashMap&lt;&gt;();
+
+    /**
+     *
+     */
+    private final List&lt;PDAnnotation&gt; selectedAnnotations;
+
+    /**
+     *
+     * @param aDocument
+     */
+<span class="fc" id="L78">    protected AbstractDocumentCommandWrapper(PDDocument aDocument) {</span>
+<span class="fc" id="L79">        wrappedDocument = aDocument;</span>
+<span class="fc" id="L80">        undoStack = new Stack&lt;&gt;();</span>
+<span class="fc" id="L81">        redoStack = new Stack&lt;&gt;();</span>
+<span class="fc" id="L82">        selectedAnnotations = new ArrayList&lt;PDAnnotation&gt;();</span>
+<span class="fc" id="L83">    }</span>
+
+    public void deselectAll() {
+<span class="nc" id="L86">        getSelectedAnnotations().clear();</span>
+<span class="nc" id="L87">    }</span>
+
+    public void extendSelectionOnPageAtPoint(int pageIndex, float x, float y) {
+<span class="nc" id="L90">        PDAnnotation candidate = getLastAnnotationOnPageAtPoint(pageIndex, x, y);</span>
+<span class="nc bnc" id="L91" title="All 4 branches missed.">        if (null != candidate &amp;&amp; !selectedAnnotations.contains(candidate)) {</span>
+<span class="nc" id="L92">            getSelectedAnnotations().add(candidate);</span>
+<span class="nc" id="L93">            System.out.println(&quot;Selected: &quot; + selectedAnnotations.toString());</span>
+
+        }
+<span class="nc" id="L96">    }</span>
+
+    public List&lt;Rectangle&gt; getSelectedAreas() {
+<span class="nc" id="L99">        ArrayList&lt;Rectangle&gt; result = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        for (PDAnnotation a : getSelectedAnnotations()) {</span>
+<span class="nc" id="L102">            PDRectangle aBBox = a.getRectangle();</span>
+<span class="nc" id="L103">            Rectangle intBBox = new Rectangle((int) aBBox.getLowerLeftX(),</span>
+<span class="nc" id="L104">                    (int) aBBox.getLowerLeftY(),</span>
+<span class="nc" id="L105">                    (int) aBBox.getWidth(), (int) aBBox.getHeight());</span>
+<span class="nc" id="L106">            result.add(intBBox);</span>
+<span class="nc" id="L107">        }</span>
+<span class="nc" id="L108">        return result;</span>
+    }
+
+    public int getSelectionSize() {
+<span class="nc" id="L112">        return getSelectedAnnotations().size();</span>
+    }
+
+    protected List&lt;PDAnnotation&gt; getSelectedAnnotations() {
+<span class="nc" id="L116">        return selectedAnnotations;</span>
+    }
+
+    public boolean getCanUndo() {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        return 0 &lt; undoStack.size();</span>
+    }
+
+    public boolean getCanRedo() {
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        return 0 &lt; redoStack.size();</span>
+    }
+
+    public String getSuggestedUndoTitle() {
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (0 &lt; undoStack.size()) {</span>
+<span class="nc" id="L129">            return undoStack.lastElement().getUndoName();</span>
+        }
+
+<span class="nc" id="L132">        return &quot;&quot;;</span>
+    }
+
+    public String getSuggestedRedoTitle() {
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (0 &lt; redoStack.size()) {</span>
+<span class="nc" id="L137">            return redoStack.lastElement().getUndoName();</span>
+        }
+
+<span class="nc" id="L140">        return &quot;&quot;;</span>
+    }
+
+    /**
+     *
+     * @param command
+     * @return
+     */
+    private boolean executeDocumentCommand(AbstractDocumentCommand command) {
+<span class="nc" id="L149">        boolean result = false;</span>
+<span class="nc" id="L150">        AbstractDocumentCommand reciprocal = command.execute();</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (null != reciprocal) {</span>
+<span class="nc" id="L152">            reciprocal.setUndoName(command.getName());</span>
+<span class="nc" id="L153">            undoStack.push(reciprocal);</span>
+<span class="nc" id="L154">            result = true;</span>
+        }
+
+<span class="nc" id="L157">        return result;</span>
+    }
+
+    /**
+     *
+     * @param command
+     * @param aName
+     */
+    protected static void registerCommandClassWithName(makeCommand command, String aName) {
+<span class="fc" id="L166">        nameToFactoryMap.put(aName, command);</span>
+        
+<span class="fc" id="L168">    }</span>
+
+    /**
+     *
+     * @return
+     */
+    public static String getCommandNames() {
+<span class="nc" id="L175">        String result = &quot;&quot;;</span>
+
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        for (String name : nameToFactoryMap.keySet()) {</span>
+<span class="nc" id="L178">            result += &quot;\t&quot; + name + &quot;\n&quot;;</span>
+<span class="nc" id="L179">        }</span>
+
+<span class="nc" id="L181">        return result;</span>
+    }
+
+    /**
+     *
+     * @param aName
+     * @param args
+     * @return
+     */
+    public boolean executeDocumentCommandWithNameAndArgs(String aName, ArrayList&lt;String&gt; args) {
+<span class="nc" id="L191">        boolean result = false;</span>
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        if (nameToFactoryMap.containsKey(aName)) {</span>
+<span class="nc" id="L194">            makeCommand makeFunction = nameToFactoryMap.get(aName);</span>
+            try {
+<span class="nc" id="L196">                AbstractDocumentCommand command = makeFunction.make(this, args);</span>
+<span class="nc" id="L197">                executeDocumentCommand(command);</span>
+
+<span class="nc" id="L199">            } catch (IllegalArgumentException ex) {</span>
+//                Logger.getLogger(AbstractDocumentCommandWrapper.class
+//                        .getName()).log(Level.SEVERE, null, ex);
+<span class="nc" id="L202">            }</span>
+
+        } else {
+//            Logger.getLogger(AbstractDocumentCommandWrapper.class
+//                    .getName()).log(Level.SEVERE, null, aName);
+        }
+
+<span class="nc" id="L209">        return result;</span>
+    }
+
+    /**
+     *
+     * @param aName
+     * @param args
+     * @return
+     */
+    public boolean executeDocumentCommandWithNameAndArgs(String aName, String[] args) {
+<span class="nc" id="L219">        ArrayList&lt;String&gt; commandArgs = new ArrayList&lt;&gt;(Arrays.asList(args));</span>
+<span class="nc" id="L220">        return executeDocumentCommandWithNameAndArgs(aName, commandArgs);</span>
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean undo() {
+<span class="nc" id="L228">        boolean result = false;</span>
+
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        if (0 &lt; undoStack.size()) {</span>
+<span class="nc" id="L231">            AbstractDocumentCommand command = undoStack.pop();</span>
+<span class="nc" id="L232">            AbstractDocumentCommand reciprocal = command.execute();</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">            if (null != reciprocal) {</span>
+<span class="nc" id="L234">                reciprocal.setUndoName(command.getUndoName());</span>
+<span class="nc" id="L235">                redoStack.push(reciprocal);</span>
+<span class="nc" id="L236">                result = true;</span>
+            }
+        }
+
+<span class="nc" id="L240">        return result;</span>
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean redo() {
+<span class="nc" id="L248">        boolean result = false;</span>
+
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        if (0 &lt; redoStack.size()) {</span>
+<span class="nc" id="L251">            AbstractDocumentCommand command = redoStack.pop();</span>
+<span class="nc" id="L252">            AbstractDocumentCommand reciprocal = command.execute();</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">            if (null != reciprocal) {</span>
+<span class="nc" id="L254">                reciprocal.setUndoName(command.getUndoName());</span>
+<span class="nc" id="L255">                undoStack.push(reciprocal);</span>
+<span class="nc" id="L256">                result = true;</span>
+            }
+        }
+
+<span class="nc" id="L260">        return result;</span>
+
+    }
+
+    protected PDAnnotation getLastAnnotationOnPageAtPoint(int pageIndex, float x, float y) {
+        try {
+<span class="nc" id="L266">            PDPage page = wrappedDocument.getPage(pageIndex);</span>
+<span class="nc" id="L267">            List&lt;PDAnnotation&gt; annotations = page.getAnnotations();</span>
+
+<span class="nc" id="L269">            return getLastAnnotationAtPoint(annotations, x, y);</span>
+<span class="nc" id="L270">        } catch (IOException ex) {</span>
+//            Logger.getLogger(AbstractDocumentCommandWrapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+<span class="nc" id="L274">        return null;</span>
+    }
+
+    /**
+     *
+     * @param annotations
+     * @param x
+     * @param y
+     * @return
+     */
+    protected PDAnnotation getLastAnnotationAtPoint(List&lt;PDAnnotation&gt; annotations, float x, float y) {
+<span class="nc" id="L285">        PDAnnotation result = null;</span>
+
+<span class="nc bnc" id="L287" title="All 2 branches missed.">        for (int i = annotations.size() - 1; i &gt;= 0; --i) {</span>
+<span class="nc" id="L288">            PDAnnotation candidate = annotations.get(i);</span>
+<span class="nc bnc" id="L289" title="All 4 branches missed.">            if (!candidate.isHidden() &amp;&amp; !candidate.isReadOnly()) {</span>
+<span class="nc" id="L290">                PDRectangle boundingBox = candidate.getRectangle();</span>
+
+<span class="nc bnc" id="L292" title="All 2 branches missed.">                if (boundingBox.contains(x, y)) {</span>
+<span class="nc" id="L293">                    return candidate;</span>
+
+                }
+            }
+        }
+
+<span class="nc" id="L299">        return result;</span>
+    }
+
+    /**
+     * This class defines the interface, variables, and common operations in
+     * order to encapsulates commands that may be executed following the Command
+     * Design Pattern. Concrete subclasses must implements execute() When
+     * executed to perform operations specific to the concrete subclass and
+     * return a reciprocal command to be executed if/when the undo is required.
+     * If undo is inappropriate for some reason, concrete implementations of
+     * execute() may return null.
+     *
+     * @author Buck, Saxena
+     *
+     */
+    protected abstract class AbstractDocumentCommand {
+
+        /**
+         *
+         */
+        protected final AbstractDocumentCommandWrapper owner;
+
+        /**
+         *
+         */
+        protected final ArrayList&lt;String&gt; arguments;
+
+        /**
+         *
+         */
+        protected List&lt;PDAnnotation&gt; annotations;
+
+        /**
+         *
+         */
+        protected String undoName;
+
+        /**
+         *
+         * @param anOwner
+         * @param args
+         */
+<span class="nc" id="L341">        protected AbstractDocumentCommand(AbstractDocumentCommandWrapper anOwner, ArrayList&lt;String&gt; args) {</span>
+<span class="nc" id="L342">            owner = anOwner;</span>
+<span class="nc" id="L343">            arguments = args;</span>
+<span class="nc" id="L344">            annotations = null;</span>
+<span class="nc" id="L345">        }</span>
+
+        /**
+         *
+         * @param anOwner
+         * @param someAnnotations
+         */
+<span class="nc" id="L352">        protected AbstractDocumentCommand(AbstractDocumentCommandWrapper anOwner, List&lt;PDAnnotation&gt; someAnnotations) {</span>
+<span class="nc" id="L353">            owner = anOwner;</span>
+<span class="nc" id="L354">            arguments = null;</span>
+<span class="nc" id="L355">            annotations = someAnnotations;</span>
+<span class="nc" id="L356">        }</span>
+
+        /**
+         *
+         * @param anOwner
+         * @param someAnnotations
+         * @param args
+         */
+<span class="nc" id="L364">        protected AbstractDocumentCommand(AbstractDocumentCommandWrapper anOwner, List&lt;PDAnnotation&gt; someAnnotations, ArrayList&lt;String&gt; args) {</span>
+<span class="nc" id="L365">            owner = anOwner;</span>
+<span class="nc" id="L366">            arguments = args;</span>
+<span class="nc" id="L367">            annotations = someAnnotations;</span>
+<span class="nc" id="L368">        }</span>
+
+        public void setUndoName(String aName) {
+<span class="nc" id="L371">            undoName = aName;</span>
+<span class="nc" id="L372">        }</span>
+
+        public String getUndoName() {
+<span class="nc bnc" id="L375" title="All 2 branches missed.">            if (null == undoName) {</span>
+<span class="nc" id="L376">                undoName = &quot;&quot;;</span>
+            }
+<span class="nc" id="L378">            return undoName;</span>
+        }
+
+        /**
+         *
+         * @return If execute() succeeds, a Command that is the reciprocal of
+         * the receiver is returned. Otherwise, null is returned.
+         */
+        public abstract AbstractDocumentCommand execute();
+
+        /**
+         *
+         * @return The name of the command as it will appear in a user interface
+         * for undo and redo operations e.g. &quot;Undo Delete Annotation&quot; where the
+         * string after &quot;Undo &quot; is returned from getName().
+         */
+        public abstract String getName();
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

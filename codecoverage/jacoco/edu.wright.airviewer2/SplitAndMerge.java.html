@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SplitAndMerge.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AirViewer2</a> &gt; <a href="index.source.html" class="el_package">edu.wright.airviewer2</a> &gt; <span class="el_source">SplitAndMerge.java</span></div><h1>SplitAndMerge.java</h1><pre class="source lang-java linenums">package edu.wright.airviewer2;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.multipdf.Splitter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+
+import com.google.java.contract.Ensures;
+import com.google.java.contract.Requires;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
+
+import javafx.scene.control.Pagination;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+<span class="fc" id="L30">public class SplitAndMerge  {</span>
+    private String textFieldValue; 
+    private boolean result;
+	/**
+	  * [issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/30)
+	  * [Pull request] (https://github.com/WSU-CEG-6110-4410/AirViewer/pull/37) 
+	  * \brief      Pdf Merge file method
+	  * 
+	  * \details    In menu bar there is option to click merge file.Once click merge file ,system prompt to 
+	  *             choose pdf file,once choose,system again prompt user to choose folder to save merge pdf.
+	  *             current existing pdf file can be merge with choosen file and combine as pdf.
+	  *             Generated pdf name contain current date and time.Using date with format &quot;ddmmyyyHHMMSS&quot;.
+	  *             So the final generated pdf file contain name &quot;merge-{ddmmyyyHHMMSS}.pdf&quot;.
+	  *             Example pdf file name &quot;merge-12042022021238.pdf&quot;.
+	  *             This method used &quot;PDFMergerUtility&quot; to merge more than one pdf file.
+	  *             This method used &quot;SimpleDateFormat&quot; class to get the current date and time for file name.
+	  *          
+	  * \note       system prompt to choose file to merge pdf.If user user did not choose file,
+	  *             system not generate pdf.
+	  *          
+	  * \param[in]  Pagination  get the pdf with page count
+	  * 
+	  * \param[in]  model       get the wrapped model with model view
+	  * 
+	  * \param[out] void  
+	  * 
+	  * \retval     show success dialog box with pdf name contain data time format.
+	  *             Format pdf :&quot;merge-{ddmmyyyyHHMMSS}.pdf&quot;. 
+	  *             Example pdf filem name &quot;merge-12042022011236.pdf&quot; 
+	  *                     
+	  * 
+	  */
+	 public void mergefile(Pagination pagination, AIRViewerModel model) throws Exception  {
+<span class="fc" id="L63">         FileChooser fileChooser = new FileChooser();</span>
+<span class="fc" id="L64">         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(&quot;PDF files (*.pdf)&quot;, &quot;*.pdf&quot;);</span>
+<span class="fc" id="L65">         fileChooser.getExtensionFilters().add(extFilter);</span>
+<span class="fc" id="L66">         System.out.println(pagination.getScene()+&quot;test&quot;);</span>
+<span class="fc" id="L67">         File newfile = null;</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">         if(pagination.getScene() != null) {</span>
+<span class="nc" id="L69">          newfile = fileChooser.showOpenDialog((Stage) pagination.getScene().getWindow());</span>
+         }else {
+<span class="fc" id="L71">        	 Path currentDir = Paths.get(&quot;.&quot;);</span>
+<span class="fc" id="L72">     		String current = currentDir.toAbsolutePath() + &quot;/src/test/resources/test.pdf&quot;;</span>
+<span class="fc" id="L73">        	 newfile = new File(current);</span>
+         }
+         
+<span class="fc" id="L76">         DirectoryChooser dirChooser = new DirectoryChooser();</span>
+<span class="fc" id="L77">         dirChooser.setTitle(&quot;Select a folder&quot;);</span>
+<span class="fc" id="L78">         File selectedDir = null;</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">         if(pagination.getScene() != null) {</span>
+<span class="nc" id="L80">          selectedDir = dirChooser.showDialog((Stage) pagination.getScene().getWindow());</span>
+         } else {
+<span class="fc" id="L82">        	 Path currentDir = Paths.get(&quot;.&quot;);</span>
+<span class="fc" id="L83">      		String current = currentDir.toAbsolutePath() + &quot;/src/test/resources/&quot;;</span>
+         	
+<span class="fc" id="L85">        	 selectedDir = new File(current);</span>
+         }
+
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">          String selectedDirPath =selectedDir !=null?selectedDir.getAbsolutePath():&quot;&quot;;</span>
+<span class="fc" id="L89">          SimpleDateFormat sf = new SimpleDateFormat(&quot;ddmmyyyHHMMSS&quot;);</span>
+
+          
+<span class="fc" id="L92">          PDFMergerUtility PDFmerger = new PDFMergerUtility();</span>
+         // PDDocument document = PDDocument.load(new File(model.getPathName()));
+<span class="fc" id="L94">          PDFmerger.addSource(new File(model.getPathName()));</span>
+<span class="fc" id="L95">          PDFmerger.addSource(newfile);</span>
+<span class="fc" id="L96">          String name = &quot;merge-&quot;+sf.format(new Date()) +&quot;.pdf&quot;;</span>
+<span class="fc" id="L97">          String path = selectedDirPath + &quot;/&quot; + name;</span>
+<span class="fc" id="L98">   		   PDFmerger.setDestinationFileName(path);</span>
+<span class="fc" id="L99">   		   PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());</span>
+   		   /**
+			* [Issue41] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/41)
+		    * Alert pops up when the merge is done successfully
+			*/
+<span class="fc" id="L104">   		   Alert alert = new Alert(AlertType.INFORMATION);</span>
+<span class="fc" id="L105">   		   alert.setTitle(&quot;Success&quot;);</span>
+<span class="fc" id="L106">   		   alert.setHeaderText(&quot;Results:&quot;);</span>
+<span class="fc" id="L107">   		   alert.setContentText(&quot;Files has been merged with name &quot; + name);</span>
+<span class="fc" id="L108">   		   alert.showAndWait();</span>
+          
+<span class="fc" id="L110">       }</span>
+    
+	 /**
+	  * [Issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/29)
+	  * \brief     Pdf splitter method
+	  * 
+	  * \details   current existing pdf file pages can be split and combine as pdf.
+	  *            In UI,can view text box to choose pages.Text field value should be comma separated
+	  *            values.Let say user choose 1,2 pages and click download button,
+	  *            then prompt user to select folder to save pdf.Generated pdf name contain 
+	  *            current date and time.Using date with format &quot;ddmmyyyHHMMSS&quot;.
+	  *            So the final generated pdf file contain name &quot;split-{ddmmyyyHHMMSS}.pdf&quot;.
+	  *            Example pdf file name &quot;split-12042022011236.pdf&quot;.
+	  *            This method used &quot;PDFMergerUtility&quot; to merge more than one pdf file.
+	  *            This method used &quot;SimpleDateFormat&quot; class to get the current date and time for file name.
+	  *          
+	  * \note      system prompt to choose folder to save split pdf.If  user did not choose folder
+	  *            system not generate pdf
+	  *          
+	  * \param[in]  textFieldValue  get the pdf pages to split,values are camma separated
+	  * 
+	  * \param[in]  Pagination      get the pdf with page count
+	  * 
+	  * \param[in]  model           get the wrapped model with model view
+	  * 
+	  * \param[out] void  
+	  * 
+	  * \retval     show success dialog box with pdf name contain data time format.
+	  *             Format Example:&quot;split-{ddmmyyyyHHMMSS}.pdf&quot;.  
+	  *                     
+	  * 
+	  */
+	 
+	 @Requires(&quot;textFieldValue != null&quot;)
+	 @Ensures(&quot;result == true&quot;)
+	 public void splitter(String textFieldValue, Pagination pagination, AIRViewerModel model) {
+			try {
+<span class="fc" id="L147">			this.textFieldValue= textFieldValue;	</span>
+<span class="fc" id="L148">			Splitter splitter = new Splitter();</span>
+<span class="fc" id="L149">		       DirectoryChooser dirChooser = new DirectoryChooser();</span>
+
+<span class="fc" id="L151">		       dirChooser.setTitle(&quot;Select a folder&quot;);</span>
+
+<span class="fc" id="L153">		       File selectedDir = null;</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">		       if(pagination.getScene() != null) {</span>
+<span class="nc" id="L155">		    	   selectedDir =  dirChooser.showDialog((Stage) pagination.getScene().getWindow());</span>
+		       } else {
+<span class="fc" id="L157">		        	 Path currentDir = Paths.get(&quot;.&quot;);</span>
+<span class="fc" id="L158">		       		String current = currentDir.toAbsolutePath() + &quot;/src/test/resources/&quot;;</span>
+<span class="fc" id="L159">		         	 selectedDir = new File(current);</span>
+		      }		    		  
+
+<span class="fc" id="L162">		       String selectedDirPath =selectedDir.getAbsolutePath();</span>
+<span class="fc" id="L163">		       SimpleDateFormat sf = new SimpleDateFormat(&quot;ddmmyyyHHMMSS&quot;);</span>
+
+		       
+<span class="fc" id="L166">		       PDFMergerUtility PDFmerger = new PDFMergerUtility();</span>
+<span class="fc" id="L167">		       PDDocument document = PDDocument.load(new File(model.getPathName()));</span>
+<span class="fc" id="L168">		       List&lt;PDDocument&gt; pages = splitter.split(document);</span>
+<span class="fc" id="L169">		       Iterator&lt;PDDocument&gt; iterator = pages.listIterator();</span>
+
+		       //Saving each page as an individual document
+		      
+		      
+<span class="fc" id="L174">		       PDDocument document1 = new PDDocument();</span>
+<span class="fc" id="L175">		       OutputStream out = new ByteArrayOutputStream();</span>
+<span class="fc" id="L176">		       boolean flag = false;</span>
+<span class="fc" id="L177">		       String[] values = textFieldValue.split(&quot;,&quot;);</span>
+<span class="fc" id="L178">		       System.out.println(&quot;valueslength&quot;+values.length);</span>
+<span class="fc" id="L179">		       int count =1;</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">		       for(int i=0;i&lt;values.length;i++) {</span>
+<span class="fc" id="L181">		    	   System.out.println(&quot;i...&quot;+values[i]);</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">		    	   for(int j=0;j&lt;pages.size();j++) {</span>
+<span class="fc" id="L183">		    		   System.out.println(&quot;j...&quot;+j);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">		    		   if(values[i].equals((j+1)+&quot;&quot;)) {</span>
+<span class="fc" id="L185">		    			   System.out.println(&quot;values..........&quot;+values[i]);</span>
+		    	    		  
+<span class="fc" id="L187">		    			   File tempfile = new File(selectedDirPath + &quot;/&quot; + &quot;temp_&quot;+values[i]+&quot;.pdf&quot;);</span>
+<span class="fc" id="L188">		    			   flag = true;  </span>
+<span class="fc" id="L189">		    			   PDDocument pd = pages.get(j);</span>
+<span class="fc" id="L190">		    			   pd.save(tempfile);</span>
+<span class="fc" id="L191">		    			   PDFmerger.addSource(tempfile);</span>
+		    			   
+		    			   
+		    		   }
+		    	   }
+		       }
+		       
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">		       if(flag) {</span>
+<span class="fc" id="L199">		    	   this.result= flag;</span>
+<span class="fc" id="L200">		    	   String name = &quot;split-&quot;+sf.format(new Date()) +&quot;.pdf&quot;;</span>
+<span class="fc" id="L201">		    	   String path = selectedDirPath + &quot;/&quot; + name;</span>
+<span class="fc" id="L202">				   PDFmerger.setDestinationFileName(path);</span>
+<span class="fc" id="L203">				   PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());</span>
+				   /**
+					* [Issue41] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/41)
+				    * Alert pops up when the split is done successfully
+					*/
+<span class="fc" id="L208">				   Alert alert = new Alert(AlertType.INFORMATION);</span>
+<span class="fc" id="L209">				   alert.setTitle(&quot;Success&quot;);</span>
+<span class="fc" id="L210">				   alert.setHeaderText(&quot;Results:&quot;);</span>
+<span class="fc" id="L211">				   alert.setContentText(&quot;File has been split with name &quot;+name);	</span>
+<span class="fc" id="L212">				   alert.showAndWait();</span>
+		       }
+<span class="fc bfc" id="L214" title="All 2 branches covered.">		       for(int i=0;i&lt;values.length;i++) {</span>
+<span class="fc" id="L215">		    	   File tempfile = new File(selectedDirPath + &quot;/&quot; + &quot;temp_&quot;+values[i]+&quot;.pdf&quot;);</span>
+<span class="fc" id="L216">		    	   tempfile.delete();</span>
+		       }
+<span class="nc" id="L218">			} catch(Exception e) {</span>
+<span class="nc" id="L219">				e.printStackTrace();</span>
+<span class="fc" id="L220">			}</span>
+<span class="fc" id="L221">		}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

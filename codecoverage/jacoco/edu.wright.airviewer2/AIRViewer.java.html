@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AIRViewer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AirViewer2</a> &gt; <a href="index.source.html" class="el_package">edu.wright.airviewer2</a> &gt; <span class="el_source">AIRViewer.java</span></div><h1>AIRViewer.java</h1><pre class="source lang-java linenums">package edu.wright.airviewer2;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * JavaFX AIRViewer
+ */
+<span class="nc bnc" id="L22" title="All 2 branches missed.">public class AIRViewer extends Application {</span>
+
+    private static Stage primaryStage;
+
+    @Override
+    public void start(Stage stage) throws Exception {
+<span class="nc" id="L28">        primaryStage = stage;</span>
+<span class="nc" id="L29">        Parent root = FXMLLoader.load(getClass().getResource(&quot;AIRFXMLDocument.fxml&quot;));</span>
+<span class="nc" id="L30">        Scene scene = new Scene(root);</span>
+<span class="nc" id="L31">        primaryStage.setScene(scene);</span>
+<span class="nc" id="L32">        primaryStage.show();</span>
+<span class="nc" id="L33">    }</span>
+
+    @Override
+    public void stop() {
+<span class="nc" id="L37">        System.out.println(&quot;Stage is closing&quot;);</span>
+        // Todo: Save file if document has been edited since last save
+<span class="nc" id="L39">    }</span>
+
+    /**
+     * This function executes the commands in the file with file system path
+     * stored in args[0] and applies the commands to a PDF file with file system
+     * path stored in args[1]. If either the path to the script cannot be read
+     * or the path to the PDF file cannot be read, IOException is thrown. If the
+     * PDF file is not a valid PDF file, error messages are reported to
+     * System.err. Commands that are executed are echoed to System.out. Commands
+     * that fail may or may not report errors to System.err depending on the
+     * command.
+     *
+     * @param args A String array containing exactly two strings interpreted as
+     * a file system path to a script file and a fille system path to a valid
+     * PDF file.
+     * @throws IOException
+     */
+    private static void runScript(String[] args) throws IOException {
+<span class="nc bnc" id="L57" title="All 6 branches missed.">        assert null != args &amp;&amp; 2 == args.length;</span>
+
+<span class="nc" id="L59">        String regex = &quot;\&quot;([^\&quot;]*)\&quot;|(\\S+)&quot;;</span>
+
+<span class="nc" id="L61">        Pattern pattern = Pattern.compile(regex);</span>
+<span class="nc" id="L62">        BufferedReader br = new BufferedReader(new FileReader(args[0]));</span>
+
+<span class="nc" id="L64">        DocumentCommandWrapper commandDocument = DocumentCommandWrapper.loadDosumentAtPath(args[1]);</span>
+        String line;
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        while ((line = br.readLine()) != null) {</span>
+<span class="nc" id="L67">            Matcher m = pattern.matcher(line);</span>
+<span class="nc" id="L68">            ArrayList&lt;String&gt; commandAndArgs = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            while (m.find()) {</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">                if (m.group(1) != null) {</span>
+                    //System.out.println(&quot;Quoted [&quot; + m.group(1) + &quot;]&quot;);
+<span class="nc" id="L72">                    commandAndArgs.add(m.group(1));</span>
+                } else {
+                    //System.out.println(&quot;Plain [&quot; + m.group(2) + &quot;]&quot;);
+<span class="nc" id="L75">                    commandAndArgs.add(m.group(2));</span>
+                }
+            }
+
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            if (0 &lt; commandAndArgs.size()) {</span>
+<span class="nc" id="L80">                System.out.println(commandAndArgs.toString());</span>
+<span class="nc" id="L81">                String[] commandAndArgsArray = commandAndArgs.toArray(new String[commandAndArgs.size()]);</span>
+<span class="nc" id="L82">                commandDocument.executeDocumentCommandWithNameAndArgs(commandAndArgsArray[0],</span>
+<span class="nc" id="L83">                        Arrays.copyOfRange(commandAndArgsArray, 1, commandAndArgsArray.length));</span>
+            }
+<span class="nc" id="L85">        }</span>
+
+<span class="nc" id="L87">    }</span>
+
+    /**
+     * This function parses the command line arguments and invokes operations
+     * based on the arguments. Calling this function with no arguments or
+     * incorrect arguments results in the function outputting usage information
+     * and then calls System.exit(-1). Otherwise, this function calls
+     * System.exit(0).
+     *
+     * In the most general case, two command line arguments are provided:
+     * \&lt;pathToScript\&gt; \&lt;pathToPDF_File\&gt;
+     * pathToScript should be a file system path to a file containing ASCII text
+     * specifying one command per line. A command is composed of space delimited
+     * strings. The first string is the name of a command. All other strings on
+     * the same line are arguments to the command. Strings within &quot; &quot; may
+     * contain spaces and are still treated as a single string argument.
+     * pathToPDF_File should be a file system path to a valid PDF file to which
+     * commands in pathToScript will be applied.
+     *
+     * @param args ARguments provided on the command line.
+     * @throws IOException
+     */
+    public static void commandLineMain(String[] args) {
+<span class="nc bnc" id="L110" title="All 6 branches missed.">        if (1 == args.length &amp;&amp; (&quot;-h&quot;.equals(args[0]) || &quot;--help&quot;.equals(args[0]))) {</span>
+//            String names = AbstractDocumentCommandWrapper.getCommandNames();
+//            System.err.println(names);
+
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        } else if (2 == args.length) {</span>
+            try {
+<span class="nc" id="L116">                runScript(args);</span>
+<span class="nc" id="L117">            } catch (IOException ex) {</span>
+//                Logger.getLogger(AIRViewer.class.getName()).log(Level.SEVERE, null, ex);
+<span class="nc" id="L119">            }</span>
+        } else {
+<span class="nc" id="L121">            System.err.println(</span>
+                    &quot;&lt;Usage: pathToScript pathToPDF_File&gt;&quot;);
+<span class="nc" id="L123">            System.err.println(</span>
+                    &quot;\tApply the commands in pathToScript to pathToPDF_File. Commands may include, save, AddBoxAnnotation, Undo, Redo, etc.&quot;);
+<span class="nc" id="L125">            System.err.println(</span>
+                    &quot;\n\t- OR -\n&quot;);
+<span class="nc" id="L127">            System.err.println(</span>
+                    &quot;&lt;Usage: -h&gt;&quot;);
+<span class="nc" id="L129">            System.err.println(</span>
+                    &quot;\tOutput a list of annotation commands and descriptions.&quot;);
+<span class="nc" id="L131">            System.err.println(</span>
+                    &quot;\n\t- OR -\n&quot;);
+<span class="nc" id="L133">            System.err.println(</span>
+                    &quot;&lt;Usage: -t pathToPDF_File&gt;&quot;);
+<span class="nc" id="L135">            System.err.println(</span>
+                    &quot;\tAnnotate pathToPDF_File with bult-in test cases and save to a similar file path with a '~' appended.&quot;);
+<span class="nc" id="L137">            System.exit(-1);</span>
+        }
+
+<span class="nc" id="L140">        System.exit(0);</span>
+<span class="nc" id="L141">    }</span>
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (0 != args.length) {</span>
+<span class="nc" id="L148">            commandLineMain(args);</span>
+        } else {
+<span class="nc" id="L150">            launch(args);</span>
+        }
+<span class="nc" id="L152">    }</span>
+
+    public static Stage getPrimaryStage() {
+<span class="nc" id="L155">        return primaryStage;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
