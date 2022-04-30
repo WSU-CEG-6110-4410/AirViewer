@@ -549,7 +549,12 @@ public class AIRViewerController implements Initializable {
 
 		Stage stage = AIRViewer.getPrimaryStage();
 		stage.addEventHandler(WindowEvent.WINDOW_SHOWING, (WindowEvent window) -> {
-			reinitializeWithModel(promptLoadModel(DEFAULT_PATH));
+			AIRViewerModel loadedModel = promptLoadModel(AIRViewerController.DEFAULT_PATH);
+            if(null != loadedModel)
+            	reinitializeWithModel(loadedModel);
+            else {
+            	System.exit(0);
+            }
 		});
 
 		// Initialize about menu control
