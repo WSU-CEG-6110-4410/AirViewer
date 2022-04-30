@@ -1,0 +1,64 @@
+1: Class Name : AIRViewerModel 
+Method Name and arguments : promptLoadModel(String startPath)
+This is the new existing code for the Select only PDF documents.
+Below are the new code for the proposed Issue:
+
+ private AIRViewerModel promptLoadModel(String startPath) {
+
+        AIRViewerModel loadedModel = null;
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open PDF File");
+            fileChooser.setInitialFileName(startPath);
+            Stage stage = (Stage) pagination.getScene().getWindow();
+            File file = fileChooser.showOpenDialog(stage);
+            if (null != file) {
+                String path = file.getCanonicalPath();
+                loadedModel = new AIRViewerModel(Paths.get(path));
+            }
+        } catch (IOException ex) {
+//            Logger.getLogger(AIRViewerController.class.getName()).log(
+//                    Level.INFO,
+//                    "Unable to open <" + ex.getLocalizedMessage() + ">",
+//                    "");
+            loadedModel = null;
+        }
+
+        return loadedModel;
+    }
+Output :
+If not selected PDF a popup will be appeared to as" only select PDF documents"
+
+
+2: Class Name : AIRViewerModel 
+This is the  existing code for the PDF doc info.
+Below are the existing modifed code for the proposed Issue:
+
+ /*Getting the Title of the docuemnt from "getDocumentInformation"*/
+String title() {
+return wrappedDocument.getDocumentInformation().getTitle();
+
+}
+/*Getting the Creation Date of the docuemnt from "getDocumentInformation"*/
+Calendar creationDate() {
+return wrappedDocument.getDocumentInformation().getCreationDate();
+
+}
+/*Getting the Modified Date of the docuemnt from "getDocumentInformation"*/
+Calendar modifiedDate() {
+return wrappedDocument.getDocumentInformation().getModificationDate();
+
+}
+/*Getting the Author of the docuemnt from "getDocumentInformation"*/
+String Author() {
+return wrappedDocument.getDocumentInformation().getAuthor();
+
+}
+/*Getting the Subject of the docuemnt from "getDocumentInformation"*/
+String Subject() {
+return wrappedDocument.getDocumentInformation().getSubject();
+
+}
+ 
+Output :
+Showing the PDF dcouement details in the pop up when opened a document

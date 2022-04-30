@@ -179,11 +179,33 @@ public class AIRViewerController implements Initializable {
 
 
 	private String path;
+	
+	/**
+	  * [Issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/28)
+	  * [Pull request] (https://github.com/WSU-CEG-6110-4410/AirViewer/pull/45)
+	  * 
+	  * \brief     to load the document into pdf viewer
+	  * 
+	  * \details   selecting only pdf formatted files to show in pdf viewer
+	  *          
+	  * \note         
+	  *          
+	  * \param[in]  path            get the start path to load the pdf files
+	  * 
+	  * 
+	  * \param[out] AIRViewerModel          return AIRViewerModel 
+	  * 
+	  * \retval     return   AIRViewerModel which can be used further in document processing
+	  *                     
+	  * 
+	  */
 
 	public AIRViewerModel promptLoadModel(String startPath) {
 
 		AIRViewerModel loadedModel = null;
+		boolean isClose = false;
 		try {
+			while(!isClose) {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle("Open PDF File");
 			fileChooser.setInitialFileName(startPath);
@@ -201,8 +223,17 @@ public class AIRViewerController implements Initializable {
 					file = fileChooser.showOpenDialog(stage);
 					path = file.getCanonicalPath();
 				}
-				loadedModel = new AIRViewerModel(Paths.get(path));
+				if(path!= null && !path.equals("")) {
+                	loadedModel = new AIRViewerModel(Paths.get(path));
+                	isClose = true;
+                }
 
+			}else {
+            	int val = JOptionPane.showConfirmDialog(null, "Do you want to exit?");
+            	if(val == 0)
+            		isClose = true;
+            	
+            }
 			}
 		} catch (IOException ex) {
 //            Logger.getLogger(AIRViewerController.class.getName()).log(
