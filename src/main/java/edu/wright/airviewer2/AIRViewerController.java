@@ -197,6 +197,7 @@ public class AIRViewerController implements Initializable {
 				path = file.getCanonicalPath();
 				while (!path.endsWith(".pdf")) {
 					System.out.println("select only pdf format files");
+					JOptionPane.showMessageDialog(null, "Please select pdf files only....");
 					file = fileChooser.showOpenDialog(stage);
 					path = file.getCanonicalPath();
 				}
@@ -212,7 +213,7 @@ public class AIRViewerController implements Initializable {
 		}
 
 		return loadedModel;
-	}
+    }
 
 	private void synchronizeSelectionKnobs() {
 		if (null != model && null != currentPageImageView && null != pageImageGroup) {
