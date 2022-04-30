@@ -48,12 +48,38 @@ public class AIRViewerModel extends DocumentCommandWrapper {
 		return wrappedDocument.getDocumentInformation().getTitle();
     	
     }
-    /*Getting the Creation Date of the docuemnt from "getDocumentInformation"*/
+    /**
+	  * [Issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/20)
+	  * [Pull request] (https://github.com/WSU-CEG-6110-4410/AirViewer/pull/34)
+	  * 
+	  * \brief     this method will help to return the creation time of a document
+	  * 
+	  *          
+	  * 
+	  * \param[out] Calendar          return document created time 
+	  * 
+	  * \retval     return   Calendar which can be used to display the document created time
+	  *                     
+	  * 
+	  */
     Calendar creationDate() {
 		return wrappedDocument.getDocumentInformation().getCreationDate();
     	
     }
-    /*Getting the Modified Date of the docuemnt from "getDocumentInformation"*/
+    /**
+  	  * [Issue] (https://github.com/WSU-CEG-6110-4410/AirViewer/issues/20)
+  	  * [Pull request] (https://github.com/WSU-CEG-6110-4410/AirViewer/pull/34)
+  	  * 
+  	  * \brief     this method will help to return the modified time of a document
+  	  * 
+  	  *          
+  	  * 
+  	  * \param[out] Calendar          return document modified time 
+  	  * 
+  	  * \retval     return   Calendar which can be used to display the document modified time
+  	  *                     
+  	  * 
+  	  */
     Calendar modifiedDate() {
 		return wrappedDocument.getDocumentInformation().getModificationDate();
     	

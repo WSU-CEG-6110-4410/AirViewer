@@ -1,0 +1,89 @@
+Contract for Programming:
+
+1: Select only PDF documents.
+/**
+*@pre ("null != file")
+@post ("result == true")
+*/
+      private AIRViewerModel promptLoadModel(String startPath) {
+
+        AIRViewerModel loadedModel = null;
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open PDF File");
+            fileChooser.setInitialFileName(startPath);
+            Stage stage = (Stage) pagination.getScene().getWindow();
+            File file = fileChooser.showOpenDialog(stage);
+            if (null != file) {
+                String path = file.getCanonicalPath();
+                loadedModel = new AIRViewerModel(Paths.get(path));
+            }
+        } catch (IOException ex) {
+//            Logger.getLogger(AIRViewerController.class.getName()).log(
+//                    Level.INFO,
+//                    "Unable to open <" + ex.getLocalizedMessage() + ">",
+//                    "");
+            loadedModel = null;
+        }
+
+        return loadedModel;
+    }
+	
+	
+	
+2: Showing PDF Document Details in a popup
+
+ /**
+*@pre ("Setting docInformation")
+@post ("result == true")
+*/
+	
+/*Getting the Title of the docuemnt from "getDocumentInformation"*/
+String title() {
+return wrappedDocument.getDocumentInformation().getTitle();
+
+}
+/*Getting the Creation Date of the docuemnt from "getDocumentInformation"*/
+Calendar creationDate() {
+return wrappedDocument.getDocumentInformation().getCreationDate();
+
+}
+/*Getting the Modified Date of the docuemnt from "getDocumentInformation"*/
+Calendar modifiedDate() {
+return wrappedDocument.getDocumentInformation().getModificationDate();
+
+}
+/*Getting the Author of the docuemnt from "getDocumentInformation"*/
+String Author() {
+return wrappedDocument.getDocumentInformation().getAuthor();
+
+}
+/*Getting the Subject of the docuemnt from "getDocumentInformation"*/
+String Subject() {
+return wrappedDocument.getDocumentInformation().getSubject();
+
+}
+
+
+// Setting the Document Information to the popup .
+JOptionPane.showMessageDialog(null,
+"Title: " + model.title() + System.lineSeparator() + "Creation Date:"
++ model.creationDate().getTime() + "\n" + "Author: " + model.Author()
++ System.lineSeparator() + "Modified Date: " + model.modifiedDate().getTime()
++ System.lineSeparator() + "Subject: " + model.Subject() + System.lineSeparator());
+
+
+3: Stoping application if window closed without selecting PDF Document
+
+ /**
+*@pre ("!path.endsWith(".pdf")")
+@post ("result == true")
+*/
+
+
+while (!path.endsWith(".pdf")) {
+					System.out.println("select only pdf format files");
+					JOptionPane.showMessageDialog(null, "Please select pdf files only....");
+					file = fileChooser.showOpenDialog(stage);
+					path = file.getCanonicalPath();
+				}
